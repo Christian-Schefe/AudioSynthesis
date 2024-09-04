@@ -1,29 +1,47 @@
+import instruments.Flute
 import nodes.*
 import wav.*
-import kotlin.random.Random
+import kotlin.time.measureTimedValue
 
 fun main() {
     val sampleRate = 44100
+    val ctx = Context(0, sampleRate)
+    val flute = Flute(ctx.random)
 
-    val note = { flute() }
-    val sequencer = InstrumentNode(note, 1)
+    flute.addNote(60, 0.0, 5.0, 0.5)
+    flute.addNote(64, 1.0, 1.0, 0.5)
+    flute.addNote(67, 2.0, 1.0, 0.5)
+    flute.addNote(65, 3.0, 1.0, 0.5)
+    flute.addNote(64, 4.0, 1.0, 0.5)
+    flute.addNote(62, 5.0, 1.0, 0.5)
+    flute.addNote(60, 6.0, 1.0, 0.5)
+    flute.addNote(60, 7.0, 2.0, 0.5)
+    flute.addNote(64, 8.0, 2.0, 0.5)
+    flute.addNote(67, 9.0, 2.0, 0.5)
+    flute.addNote(65, 10.0, 2.0, 0.5)
+    flute.addNote(64, 11.0, 2.0, 0.5)
+    flute.addNote(62, 12.0, 2.0, 0.5)
+    flute.addNote(60, 13.0, 2.0, 0.5)
+    flute.addNote(50, 14.0, 1.0, 0.5)
+    flute.addNote(54, 15.0, 1.0, 0.5)
+    flute.addNote(57, 16.0, 1.0, 0.5)
+    flute.addNote(55, 17.0, 1.0, 0.5)
+    flute.addNote(54, 18.0, 1.0, 0.5)
+    flute.addNote(52, 19.0, 1.0, 0.5)
+    flute.addNote(50, 20.0, 1.0, 0.5)
 
-    sequencer.addNote(60, 0.0, 2.5)
+    val renderer = AudioRenderer(ctx, flute, sampleRate)
 
-    val renderer = AudioRenderer(sequencer * 0.2, sampleRate)
-    val samples = renderer.renderMono(15.0, 2)
+    val (samples, timeTaken) = measureTimedValue {
+        renderer.renderStereo(25.0, 2)
+    }
+
+    println("Time taken: $timeTaken")
 
     val wavFile = WavFile(
         AudioFormat.PCM, samples, sampleRate
-    ).buildWavFile()
+    ).withNormalizedSamples().buildWavFile()
 
     wavFile.writeToFile("output.wav")
 }
 
-fun flute(): AudioNode {
-    val phase = Random.nextDouble(0.0, 1.0)
-    val sound = (triangleNode(initialPhase = phase) * 0.2) bus (sineNode(
-        initialPhase = phase
-    ) * 0.8)
-    return adsrVolume(sound, 0.05, 0.0, 1.0, 0.5)
-}

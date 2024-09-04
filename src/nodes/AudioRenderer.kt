@@ -1,6 +1,6 @@
 package nodes
 
-class AudioRenderer(private val audioNode: AudioNode, private val sampleRate: Int) {
+class AudioRenderer(private val ctx: Context, private val audioNode: AudioNode, private val sampleRate: Int) {
     init {
         require(sampleRate > 0)
         require(audioNode.inputCount == 0)
@@ -9,8 +9,9 @@ class AudioRenderer(private val audioNode: AudioNode, private val sampleRate: In
     fun renderMono(seconds: Double, channels: Int = 2): Array<DoubleArray> {
         val ticks = (sampleRate * seconds).toInt()
 
-        val ctx = Context(sampleRate)
-        val outputs = Array(channels, { mutableListOf<Double>() })
+        val outputs = Array(channels) { mutableListOf<Double>() }
+
+        audioNode.init(ctx)
 
         for (i in 0..<ticks) {
             val inputs = DoubleArray(0)
@@ -27,8 +28,9 @@ class AudioRenderer(private val audioNode: AudioNode, private val sampleRate: In
     fun renderStereo(seconds: Double, channels: Int = 2): Array<DoubleArray> {
         val ticks = (sampleRate * seconds).toInt()
 
-        val ctx = Context(sampleRate)
-        val outputs = Array(channels, { mutableListOf<Double>() })
+        val outputs = Array(channels) { mutableListOf<Double>() }
+
+        audioNode.init(ctx)
 
         for (i in 0..<ticks) {
             val inputs = DoubleArray(0)

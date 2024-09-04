@@ -1,11 +1,14 @@
 package nodes
 
-class Context(val sampleRate: Int) {
+import kotlin.random.Random
+
+class Context(val seed: Int, val sampleRate: Int) {
     var time = 0.0
         private set
     var sampleCount = 0
         private set
     val timeStep = 1.0 / sampleRate
+    val random = Random(seed)
 
     fun tick() {
         time += timeStep

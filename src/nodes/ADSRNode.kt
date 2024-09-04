@@ -2,7 +2,7 @@ package nodes
 
 import kotlin.math.min
 
-class ADSRNode(val attack: Double, val decay: Double, val sustain: Double, val release: Double) : AudioNode(1, 1) {
+class ADSRNode(private val attack: Double, private val decay: Double, private val sustain: Double, private val release: Double) : AudioNode(1, 1) {
     private var state = State.OFF
 
     private var time = 0.0
@@ -73,7 +73,7 @@ class ADSRNode(val attack: Double, val decay: Double, val sustain: Double, val r
         return doubleArrayOf(value)
     }
 
-    fun lerp(from: Double, to: Double, t: Double): Double {
+    private fun lerp(from: Double, to: Double, t: Double): Double {
         return from + (to - from) * t
     }
 

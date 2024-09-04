@@ -1,12 +1,6 @@
 package nodes
 
-fun expFalloff(decay: Double): Envelope {
-    return Envelope({ Math.exp(-it / decay) })
-}
-
-fun hold(time: Double): Envelope {
-    return Envelope({ if (it <= time) 1.0 else 0.0 })
-}
+import kotlin.math.exp
 
 class Envelope(val func: (Double) -> Double) : AudioNode(0, 1) {
     private var time = 0.0
@@ -24,5 +18,15 @@ class Envelope(val func: (Double) -> Double) : AudioNode(0, 1) {
         val cloned = Envelope(func)
         cloned.time = time
         return cloned
+    }
+
+    companion object {
+        fun expFalloff(decay: Double): Envelope {
+            return Envelope { exp(-it / decay) }
+        }
+
+        fun hold(time: Double): Envelope {
+            return Envelope { if (it <= time) 1.0 else 0.0 }
+        }
     }
 }

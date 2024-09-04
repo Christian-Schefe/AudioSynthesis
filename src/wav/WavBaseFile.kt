@@ -14,10 +14,20 @@ abstract class WavBaseFile(val samples: Array<DoubleArray>, val sampleRate: Int)
     }
 }
 
-class WavFile(format: AudioFormat, samples: Array<DoubleArray>, sampleRate: Int) : WavBaseFile(samples, sampleRate) {
+class WavFile(private val format: AudioFormat, samples: Array<DoubleArray>, sampleRate: Int) :
+    WavBaseFile(samples, sampleRate) {
     private val instance = when (format) {
         AudioFormat.PCM -> WavPCMFile(samples, sampleRate)
         AudioFormat.IEEE_FLOAT -> WavIEEEFile(samples, sampleRate)
+    }
+
+    fun withNormalizedSamples(factor: Double = 0.99): WavFile {
+        val maxAmplitude = samples.mapNotNull { it.maxOrNull() }.maxOrNull() ?: 1.0
+        return WavFile(
+            format,
+            samples.map { channel -> channel.map { (it / maxAmplitude) * factor }.toDoubleArray() }.toTypedArray(),
+            sampleRate
+        )
     }
 
     override fun computeAudioData(): ByteArray {

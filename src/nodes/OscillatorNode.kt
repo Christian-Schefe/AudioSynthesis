@@ -1,0 +1,49 @@
+package nodes
+
+import kotlin.math.PI
+import kotlin.math.sin
+
+
+class OscillatorNode(private val oscillator: (Double) -> Double, private val initialPhase: Double = 0.0) :
+    AudioNode(1, 1) {
+    private var phase = initialPhase
+
+    override fun process(ctx: Context, inputs: DoubleArray): DoubleArray {
+        val freq = inputs[0]
+        phase += ctx.timeStep * freq
+        while (phase >= 1.0) phase -= 1.0
+        return doubleArrayOf(oscillator(phase))
+    }
+
+    override fun reset() {
+        phase = initialPhase
+    }
+
+    override fun clone(): AudioNode {
+        val cloned = OscillatorNode(oscillator, initialPhase)
+        cloned.phase = phase
+        return cloned
+    }
+
+    companion object {
+        fun sine(freq: Double? = null, initialPhase: Double = 0.0): AudioNode {
+            OscillatorNode({ sin(2 * PI * it) }, initialPhase).run {
+                return if (freq != null) (freq pipe this) else this
+            }
+        }
+
+        fun square(freq: Double? = null, initialPhase: Double = 0.0): AudioNode {
+            OscillatorNode({ if (it < 0.5) 1.0 else -1.0 }, initialPhase).run {
+                return if (freq != null) (freq pipe this) else this
+            }
+        }
+
+        fun triangle(freq: Double? = null, initialPhase: Double = 0.0): AudioNode {
+            OscillatorNode(
+                { if (it < 0.25) 4 * it else if (it < 0.75) 2 - 4 * it else -4 + 4 * it }, initialPhase
+            ).run {
+                return if (freq != null) (freq pipe this) else this
+            }
+        }
+    }
+}
