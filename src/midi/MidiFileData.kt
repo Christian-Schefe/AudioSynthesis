@@ -1,0 +1,4 @@
+package midi
+
+class MidiFileData {
+}

@@ -1,13 +1,18 @@
 package wav
 
+import util.ByteArrayBuilder
+import util.ByteReader
+import util.Endianness
 import java.io.FileOutputStream
 
-class WavFileData(fmtChunk: FmtChunk, audioData: ByteArray, createFactChunk: Boolean = false) {
-    private val riffChunk = RiffChunk(
-        listOfNotNull(
-            fmtChunk,
-            if (createFactChunk) FactChunk(audioData.size / fmtChunk.blockAlign) else null,
-            DataChunk(audioData)
+class WavFileData(val riffChunk: RiffChunk) {
+    constructor(fmtChunk: FmtChunk, audioData: ByteArray, createFactChunk: Boolean = false) : this(
+        RiffChunk(
+            listOfNotNull(
+                fmtChunk,
+                if (createFactChunk) FactChunk(audioData.size / fmtChunk.blockAlign) else null,
+                DataChunk(audioData)
+            )
         )
     )
 
@@ -23,22 +28,38 @@ class WavFileData(fmtChunk: FmtChunk, audioData: ByteArray, createFactChunk: Boo
 }
 
 open class Chunk(
-    private val id: String, val size: Int
+    var type: ChunkType, var size: Int
 ) {
     open fun write(byteArrayBuilder: ByteArrayBuilder) {
-        byteArrayBuilder.addString(id)
+        byteArrayBuilder.addString(type.id)
         byteArrayBuilder.addInt(size)
     }
 }
 
+enum class ChunkType(val id: String) {
+    FMT("fmt "), FACT("fact"), DATA("data"), RIFF("RIFF");
+
+    init {
+        require(id.length == 4) {
+            "Chunk ID must be 4 characters long"
+        }
+    }
+}
+
 class RiffChunk(
-    private val chunks: List<Chunk>
-) : Chunk("RIFF", 4 + chunks.sumOf { it.size }) {
+    private val chunks: Map<ChunkType, Chunk>
+) : Chunk(ChunkType.RIFF, 4 + chunks.values.sumOf { it.size }) {
     override fun write(byteArrayBuilder: ByteArrayBuilder) {
         super.write(byteArrayBuilder)
         byteArrayBuilder.addString("WAVE")
-        chunks.forEach { it.write(byteArrayBuilder) }
+        chunks.forEach { id, chunk -> chunk.write(byteArrayBuilder) }
     }
+
+    fun getChunk(id: ChunkType): Any {
+        return chunks[id] ?: throw IllegalArgumentException("Chunk not found")
+    }
+
+    constructor(chunks: List<Chunk>) : this(chunks.associateBy { it.type })
 }
 
 open class FmtChunk(
@@ -49,7 +70,7 @@ open class FmtChunk(
     val blockAlign: Short,
     val bitsPerSample: Short,
     val fmtChunkExtension: FmtChunkExtension? = null
-) : Chunk("fmt ", 16 + (fmtChunkExtension?.size() ?: 0)) {
+) : Chunk(ChunkType.FMT, 16 + (fmtChunkExtension?.size() ?: 0)) {
     override fun write(byteArrayBuilder: ByteArrayBuilder) {
         super.write(byteArrayBuilder)
         byteArrayBuilder.addShort(formatType.code)
@@ -90,7 +111,7 @@ class FmtChunkExtension(
 
 class FactChunk(
     private val sampleLength: Int
-) : Chunk("fact", 4) {
+) : Chunk(ChunkType.FACT, 4) {
     override fun write(byteArrayBuilder: ByteArrayBuilder) {
         super.write(byteArrayBuilder)
         byteArrayBuilder.addInt(sampleLength)
@@ -98,8 +119,8 @@ class FactChunk(
 }
 
 class DataChunk(
-    private val audioData: ByteArray
-) : Chunk("data", audioData.size) {
+    val audioData: ByteArray
+) : Chunk(ChunkType.DATA, audioData.size) {
     override fun write(byteArrayBuilder: ByteArrayBuilder) {
         super.write(byteArrayBuilder)
         byteArrayBuilder.addBytes(audioData)
@@ -109,7 +130,23 @@ class DataChunk(
     }
 }
 
-enum class AudioFormat(val code: Short) {
-    PCM(1),
-    IEEE_FLOAT(3)
+enum class AudioFormat(
+    val code: Short,
+    val bytesPerSample: Int = 0,
+    val writeSample: (Double, ByteArrayBuilder) -> Unit,
+    val readSample: (ByteReader) -> Double
+) {
+    PCM(1, 2, { sample, byteArrayBuilder ->
+        byteArrayBuilder.addShort((sample.coerceIn(-1.0, 1.0) * Short.MAX_VALUE).toInt())
+    }, { reader -> reader.readShort().toDouble() / Short.MAX_VALUE }),
+    IEEE_FLOAT(3,
+        4,
+        { sample, byteArrayBuilder -> byteArrayBuilder.addFloat(sample.toFloat()) },
+        { reader -> reader.readFloat().toDouble() });
+
+    companion object {
+        fun fromCode(code: Short): AudioFormat {
+            return entries.find { it.code == code } ?: throw IllegalArgumentException("Unknown audio format")
+        }
+    }
 }

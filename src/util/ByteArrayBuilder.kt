@@ -1,8 +1,4 @@
-package wav
-
-enum class Endianness {
-    LITTLE, BIG
-}
+package util
 
 class ByteArrayBuilder(val endianness: Endianness) {
     private val bytes = mutableListOf<Byte>()
