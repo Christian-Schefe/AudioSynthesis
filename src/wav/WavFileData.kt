@@ -1,42 +1,34 @@
 package wav
 
-import util.ByteArrayBuilder
-import util.ByteReader
-import util.Endianness
-import java.io.FileOutputStream
+import util.ByteWriter
 
 class WavFileData(val riffChunk: RiffChunk) {
     constructor(fmtChunk: FmtChunk, audioData: ByteArray, createFactChunk: Boolean = false) : this(
         RiffChunk(
             listOfNotNull(
                 fmtChunk,
-                if (createFactChunk) FactChunk(audioData.size / fmtChunk.blockAlign) else null,
+                if (createFactChunk) FactChunk(audioData.size.toUInt() / fmtChunk.blockAlign) else null,
                 DataChunk(audioData)
             )
         )
     )
 
-    fun writeToFile(filePath: String) {
-        val byteArrayBuilder = ByteArrayBuilder(Endianness.LITTLE)
-
-        riffChunk.write(byteArrayBuilder)
-
-        val fileOutputStream = FileOutputStream(filePath)
-        fileOutputStream.write(byteArrayBuilder.toByteArray())
-        fileOutputStream.close()
+    fun write(byteWriter: ByteWriter) {
+        riffChunk.write(byteWriter)
     }
 }
 
 open class Chunk(
-    var type: ChunkType, var size: Int
+    var type: WavChunkType, var size: UInt
 ) {
-    open fun write(byteArrayBuilder: ByteArrayBuilder) {
-        byteArrayBuilder.addString(type.id)
-        byteArrayBuilder.addInt(size)
+    open val totalSize = size + 8u
+    open fun write(byteWriter: ByteWriter) {
+        byteWriter.addString(type.id)
+        byteWriter.addInt(size)
     }
 }
 
-enum class ChunkType(val id: String) {
+enum class WavChunkType(val id: String) {
     FMT("fmt "), FACT("fact"), DATA("data"), RIFF("RIFF");
 
     init {
@@ -47,15 +39,15 @@ enum class ChunkType(val id: String) {
 }
 
 class RiffChunk(
-    private val chunks: Map<ChunkType, Chunk>
-) : Chunk(ChunkType.RIFF, 4 + chunks.values.sumOf { it.size }) {
-    override fun write(byteArrayBuilder: ByteArrayBuilder) {
-        super.write(byteArrayBuilder)
-        byteArrayBuilder.addString("WAVE")
-        chunks.forEach { id, chunk -> chunk.write(byteArrayBuilder) }
+    private val chunks: Map<WavChunkType, Chunk>
+) : Chunk(WavChunkType.RIFF, 4u + chunks.values.sumOf { it.totalSize }) {
+    override fun write(byteWriter: ByteWriter) {
+        super.write(byteWriter)
+        byteWriter.addString("WAVE")
+        chunks.forEach { (_, chunk) -> chunk.write(byteWriter) }
     }
 
-    fun getChunk(id: ChunkType): Any {
+    fun getChunk(id: WavChunkType): Any {
         return chunks[id] ?: throw IllegalArgumentException("Chunk not found")
     }
 
@@ -64,89 +56,69 @@ class RiffChunk(
 
 open class FmtChunk(
     val formatType: AudioFormat,
-    val numChannels: Short,
-    val sampleRate: Int,
-    val byteRate: Int,
-    val blockAlign: Short,
-    val bitsPerSample: Short,
+    val numChannels: UShort,
+    val sampleRate: UInt,
+    val byteRate: UInt,
+    val blockAlign: UShort,
+    val bitsPerSample: UShort,
     val fmtChunkExtension: FmtChunkExtension? = null
-) : Chunk(ChunkType.FMT, 16 + (fmtChunkExtension?.size() ?: 0)) {
-    override fun write(byteArrayBuilder: ByteArrayBuilder) {
-        super.write(byteArrayBuilder)
-        byteArrayBuilder.addShort(formatType.code)
-        byteArrayBuilder.addShort(numChannels)
-        byteArrayBuilder.addInt(sampleRate)
-        byteArrayBuilder.addInt(byteRate)
-        byteArrayBuilder.addShort(blockAlign)
-        byteArrayBuilder.addShort(bitsPerSample)
-        fmtChunkExtension?.write(byteArrayBuilder)
+) : Chunk(WavChunkType.FMT, 16u + (fmtChunkExtension?.size() ?: 0u)) {
+    override fun write(byteWriter: ByteWriter) {
+        super.write(byteWriter)
+        byteWriter.addShort(formatType.code)
+        byteWriter.addShort(numChannels)
+        byteWriter.addInt(sampleRate)
+        byteWriter.addInt(byteRate)
+        byteWriter.addShort(blockAlign)
+        byteWriter.addShort(bitsPerSample)
+        fmtChunkExtension?.write(byteWriter)
     }
 }
 
 class FmtChunkExtension(
-    private val extensionSize: Short,
-    private val validBitsPerSample: Short,
-    private val channelMask: Int,
+    private val extensionSize: UShort,
+    private val validBitsPerSample: UShort,
+    private val channelMask: UInt,
     private val subFormat: ByteArray
 ) {
     init {
-        if (extensionSize > 0 && subFormat.size != 16) {
+        if (extensionSize > 0u && subFormat.size != 16) {
             throw IllegalArgumentException("SubFormat size must be 16")
         }
     }
 
-    fun write(byteArrayBuilder: ByteArrayBuilder) {
-        byteArrayBuilder.addShort(extensionSize)
-        if (extensionSize > 0) {
-            byteArrayBuilder.addShort(validBitsPerSample)
-            byteArrayBuilder.addInt(channelMask)
-            byteArrayBuilder.addBytes(subFormat)
+    fun write(byteWriter: ByteWriter) {
+        byteWriter.addShort(extensionSize)
+        if (extensionSize > 0u) {
+            byteWriter.addShort(validBitsPerSample)
+            byteWriter.addInt(channelMask)
+            byteWriter.addBytes(subFormat)
         }
     }
 
-    fun size() = if (extensionSize > 0) 24 else 2
+    fun size() = if (extensionSize > 0u) 24u else 2u
 
-    constructor() : this(0, 0, 0, byteArrayOf())
+    constructor() : this(0u, 0u, 0u, byteArrayOf())
 }
 
 class FactChunk(
-    private val sampleLength: Int
-) : Chunk(ChunkType.FACT, 4) {
-    override fun write(byteArrayBuilder: ByteArrayBuilder) {
-        super.write(byteArrayBuilder)
-        byteArrayBuilder.addInt(sampleLength)
+    private val sampleLength: UInt
+) : Chunk(WavChunkType.FACT, 4u) {
+    override fun write(byteWriter: ByteWriter) {
+        super.write(byteWriter)
+        byteWriter.addInt(sampleLength)
     }
 }
 
 class DataChunk(
     val audioData: ByteArray
-) : Chunk(ChunkType.DATA, audioData.size) {
-    override fun write(byteArrayBuilder: ByteArrayBuilder) {
-        super.write(byteArrayBuilder)
-        byteArrayBuilder.addBytes(audioData)
+) : Chunk(WavChunkType.DATA, audioData.size.toUInt()) {
+    override val totalSize = size + 8u + (size % 2u)
+    override fun write(byteWriter: ByteWriter) {
+        super.write(byteWriter)
+        byteWriter.addBytes(audioData)
         if (audioData.size % 2 != 0) {
-            byteArrayBuilder.addByte(0)
-        }
-    }
-}
-
-enum class AudioFormat(
-    val code: Short,
-    val bytesPerSample: Int = 0,
-    val writeSample: (Double, ByteArrayBuilder) -> Unit,
-    val readSample: (ByteReader) -> Double
-) {
-    PCM(1, 2, { sample, byteArrayBuilder ->
-        byteArrayBuilder.addShort((sample.coerceIn(-1.0, 1.0) * Short.MAX_VALUE).toInt())
-    }, { reader -> reader.readShort().toDouble() / Short.MAX_VALUE }),
-    IEEE_FLOAT(3,
-        4,
-        { sample, byteArrayBuilder -> byteArrayBuilder.addFloat(sample.toFloat()) },
-        { reader -> reader.readFloat().toDouble() });
-
-    companion object {
-        fun fromCode(code: Short): AudioFormat {
-            return entries.find { it.code == code } ?: throw IllegalArgumentException("Unknown audio format")
+            byteWriter.addByte(0u)
         }
     }
 }

@@ -4,7 +4,8 @@ import wav.*
 import kotlin.time.measureTimedValue
 
 fun main() {
-    val sampleRate = 44100/*val ctx = Context(0, sampleRate)
+    val sampleRate = 44100
+    val ctx = Context(0, sampleRate)
     val flute = Flute(ctx.random)
 
     flute.addNote(60, 0.0, 5.0, 0.5)
@@ -35,24 +36,28 @@ fun main() {
         renderer.renderStereo(5.0, 2)
     }
 
-    println("Time taken: $timeTaken")*/
+    println("Time taken: $timeTaken")
+
+    /*val samples = arrayOf(
+        doubleArrayOf(0.0, 1.0, -0.5, 0.33, -1.0),
+        doubleArrayOf(1.0, 0.1, -0.2, 0.3, -1.0),
+        doubleArrayOf(1.0, 0.1, -0.2, 0.3, -1.0)
+    )*/
 
     val wavFile = WavFile(
-        AudioFormat.IEEE_FLOAT, arrayOf(doubleArrayOf(0.0, 1.0, -0.5, 0.33), doubleArrayOf(1.0, 0.1, -0.2, 0.3)), sampleRate
-    ).withNormalizedSamples()
+        AudioFormat.PCM, samples, sampleRate.toUInt()
+    ).withNormalizedSamples(1.0)
 
-    wavFile.buildWavFileData().writeToFile("output.wav")
+    wavFile.writeToFile("output.wav")
 
-    val reader = WavFileReader()
-    val wavFileData = reader.readWavFile("output.wav")
-    val wavFile2 = WavFile.fromWavFileData(wavFileData)
+    val wavFile2 = WavFile.readFromFile("output.wav")
 
-    for (i in 0..<wavFile.samples.size) {
+    /*for (i in 0..<wavFile.samples.size) {
         for (j in 0..<wavFile.samples[i].size) {
             if (wavFile.samples[i][j] != wavFile2.samples[i][j]) {
                 println("Mismatch at $i, $j: ${wavFile.samples[i][j]} != ${wavFile2.samples[i][j]}")
             }
         }
-    }
+    }*/
 }
 

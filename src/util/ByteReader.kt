@@ -9,9 +9,13 @@ class ByteReader(val endianness: Endianness, val bytes: ByteArray) {
         return result
     }
 
-    fun readShort(): Short {
-        val byte1 = readByte()
-        val byte2 = readByte()
+    fun readUByte(): UByte {
+        return readByte().toUByte()
+    }
+
+    fun readUShort(): UShort {
+        val byte1 = readUByte()
+        val byte2 = readUByte()
         return if (endianness == Endianness.LITTLE) {
             BitConverter.bitsToShort(byte1, byte2)
         } else {
@@ -19,11 +23,15 @@ class ByteReader(val endianness: Endianness, val bytes: ByteArray) {
         }
     }
 
-    fun readInt(): Int {
-        val byte1 = readByte()
-        val byte2 = readByte()
-        val byte3 = readByte()
-        val byte4 = readByte()
+    fun readShort(): Short {
+        return readUShort().toShort()
+    }
+
+    fun readUInt(): UInt {
+        val byte1 = readUByte()
+        val byte2 = readUByte()
+        val byte3 = readUByte()
+        val byte4 = readUByte()
         return if (endianness == Endianness.LITTLE) {
             BitConverter.bitsToInt(byte1, byte2, byte3, byte4)
         } else {
@@ -31,20 +39,28 @@ class ByteReader(val endianness: Endianness, val bytes: ByteArray) {
         }
     }
 
-    fun readLong(): Long {
-        val byte1 = readByte()
-        val byte2 = readByte()
-        val byte3 = readByte()
-        val byte4 = readByte()
-        val byte5 = readByte()
-        val byte6 = readByte()
-        val byte7 = readByte()
-        val byte8 = readByte()
+    fun readInt(): Int {
+        return readUInt().toInt()
+    }
+
+    fun readULong(): ULong {
+        val byte1 = readUByte()
+        val byte2 = readUByte()
+        val byte3 = readUByte()
+        val byte4 = readUByte()
+        val byte5 = readUByte()
+        val byte6 = readUByte()
+        val byte7 = readUByte()
+        val byte8 = readUByte()
         return if (endianness == Endianness.LITTLE) {
             BitConverter.bitsToLong(byte1, byte2, byte3, byte4, byte5, byte6, byte7, byte8)
         } else {
             BitConverter.bitsToLong(byte8, byte7, byte6, byte5, byte4, byte3, byte2, byte1)
         }
+    }
+
+    fun readLong(): Long {
+        return readULong().toLong()
     }
 
     fun readFloat(): Float {
@@ -55,14 +71,18 @@ class ByteReader(val endianness: Endianness, val bytes: ByteArray) {
         return Double.fromBits(readLong())
     }
 
-    fun readVariableLengthQuantity(): Int {
-        var value = 0
-        var byte: Int
+    fun readVarUInt(): UInt {
+        var value = 0u
+        var byte: UInt
         do {
-            byte = readByte().toInt()
-            value = (value shl 7) or (byte and 0x7F)
-        } while (byte and 0x80 != 0)
+            byte = readUByte().toUInt()
+            value = (value shl 7) or (byte and 0x7Fu)
+        } while (byte and 0x80u != 0u)
         return value
+    }
+
+    fun readVarInt(): Int {
+        return readVarUInt().toInt()
     }
 
     fun readString(length: Int): String {
