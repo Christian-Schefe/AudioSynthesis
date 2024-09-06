@@ -1,6 +1,6 @@
 package util
 
-class ByteReader(val endianness: Endianness, val bytes: ByteArray) {
+class ByteReader(private val endianness: Endianness, private val bytes: ByteArray) {
     private var index = 0
 
     fun readByte(): Byte {
@@ -96,6 +96,7 @@ class ByteReader(val endianness: Endianness, val bytes: ByteArray) {
     }
 
     fun readBytes(length: Int): ByteArray {
+        require(length <= bytesLeft()) { "Not enough bytes left: ${bytesLeft()}/$length" }
         val byteArray = bytes.copyOfRange(index, index + length)
         index += length
         return byteArray

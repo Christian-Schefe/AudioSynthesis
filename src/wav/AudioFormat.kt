@@ -1,8 +1,9 @@
 package wav
 
+import decodeMuLaw
+import encodeMuLaw
 import util.ByteReader
 import util.ByteWriter
-
 
 enum class AudioFormat(
     val code: UShort,
@@ -17,10 +18,12 @@ enum class AudioFormat(
     IEEE_FLOAT(3u,
         4u,
         { sample, writer -> writer.addFloat(toIeeeFloat(sample)) },
-        { reader -> wav.fromIeeeFloat(reader.readFloat()) }),
-    A_LAW(6u, 1u, { sample, writer ->
+        { reader -> wav.fromIeeeFloat(reader.readFloat()) }),/*A_LAW(6u, 1u, { sample, writer ->
         writer.addByte(toALaw(sample))
-    }, { reader -> fromALaw(reader.readUByte()) });
+    }, { reader -> fromALaw(reader.readUByte()) }),
+    MU_LAW(7u, 1u, { sample, writer ->
+        writer.addByte(toMuLaw(sample))
+    }, { reader -> fromMuLaw(reader.readUByte()) })*/;
 
     companion object {
         fun fromCode(code: UShort): AudioFormat {
@@ -46,63 +49,62 @@ fun fromIeeeFloat(sample: Float): Double {
 }
 
 fun toALaw(sample: Double): UByte {
-    return pcmToALaw(toPcm(sample).toInt())
+    return encodeALaw(toPcm(sample).toInt() shr 4)
 }
 
 fun fromALaw(sample: UByte): Double {
-    return fromPcm(aLawToPcm(sample).toShort())
+    return fromPcm((decodeALaw(sample) shl 4).toShort())
 }
 
-fun pcmToALaw(pcmSample: Int): UByte {
+fun toMuLaw(sample: Double): UByte {
+    return encodeMuLaw(toPcm(sample))
+}
+
+fun fromMuLaw(sample: UByte): Double {
+    return fromPcm(decodeMuLaw(sample))
+}
+
+
+fun encodeALaw(number: Int): UByte {
     val aLawMax = 0xFFF
     var mask = 0x800
-    var sample = pcmSample
+    var sample = number
 
-    // Handle sign
-    val sign = if (pcmSample < 0) {
-        sample = -pcmSample
+    val sign = if (number < 0) {
+        sample = -number
         0x80
     } else 0
 
-    // Clamp to the maximum A-Law value
     if (sample > aLawMax) {
         sample = aLawMax
     }
 
-    // Find the position
     var position = 11
     while ((sample and mask) != mask && position >= 5) {
         mask = mask shr 1
         position--
     }
 
-    // Calculate the least significant bits
     val lsb = (sample shr (if (position == 4) 1 else position - 4)) and 0x0F
 
-    // Return the A-Law byte
     return ((sign or ((position - 4) shl 4) or lsb) xor 0x55).toUByte()
 }
 
-fun aLawToPcm(number: UByte): Int {
-    // XOR the input with 0x55 as in A-Law encoding
-    var sample = number.toInt() xor 0x55
+fun decodeALaw(number: UByte): Int {
+    var sample = number.toUInt() xor 0x55u
 
-    // Determine the sign
-    val sign = if (sample and 0x80 != 0) {
-        sample = sample and (1 shl 7).inv() // Remove the sign bit
+    val sign = if (sample and 0x80u != 0u) {
+        sample = sample and (1u shl 7).inv()
         -1
     } else 0
 
-    // Extract the exponent (position) and mantissa
-    val position = ((sample and 0xF0) shr 4) + 4
+    val position = ((sample and 0xF0u) shr 4).toInt() + 4
 
-    // Decode based on the position
     val decoded = if (position != 4) {
-        ((1 shl position) or ((sample and 0x0F) shl (position - 4)) or (1 shl (position - 5)))
+        ((1u shl position) or ((sample and 0x0Fu) shl (position - 4)) or (1u shl (position - 5)))
     } else {
-        (sample shl 1) or 1
+        (sample shl 1) or 1u
     }
 
-    // Apply the sign
-    return if (sign == 0) decoded else (-decoded)
+    return if (sign == 0) decoded.toInt() else (-decoded.toInt())
 }

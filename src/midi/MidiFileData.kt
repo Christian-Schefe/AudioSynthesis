@@ -3,7 +3,7 @@ package midi
 import util.BitConverter
 import util.ByteWriter
 
-class MidiFileData(private val headerChunk: HeaderChunk, private val tracks: List<TrackChunk>) {
+class MidiFileData(private val headerChunk: HeaderChunk, val tracks: List<TrackChunk>) {
     init {
         when (headerChunk.format) {
             FormatType.SINGLE_TRACK -> require(tracks.size == 1) {
@@ -51,7 +51,7 @@ class HeaderChunk(
 }
 
 class TrackChunk(
-    private val events: List<TrackEvent>
+    val events: List<TrackEvent>
 ) : Chunk(MidiChunkType.MTrk, events.sumOf { it.size }) {
     override fun write(byteWriter: ByteWriter) {
         super.write(byteWriter)
@@ -59,7 +59,7 @@ class TrackChunk(
     }
 }
 
-class TrackEvent(
+data class TrackEvent(
     private val deltaTime: UInt, private val event: MidiEvent
 ) {
     val size: UInt = BitConverter.intToVarInt(deltaTime).size.toUInt() + event.size
@@ -84,13 +84,13 @@ abstract class Division {
     abstract fun write(byteWriter: ByteWriter)
 }
 
-class TicksPerQuarterNote(private val ticks: UShort) : Division() {
+data class TicksPerQuarterNote(private val ticks: UShort) : Division() {
     override fun write(byteWriter: ByteWriter) {
         byteWriter.addShort(ticks and 0x7FFFu)
     }
 }
 
-class SMPTE(private val framesPerSecond: UByte, private val ticksPerFrame: UByte) : Division() {
+data class SMPTE(private val framesPerSecond: UByte, private val ticksPerFrame: UByte) : Division() {
     override fun write(byteWriter: ByteWriter) {
         byteWriter.addByte(framesPerSecond and 0x7Fu)
         byteWriter.addByte(ticksPerFrame)

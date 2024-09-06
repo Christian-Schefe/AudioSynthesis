@@ -4,7 +4,7 @@ import util.ByteWriter
 import util.Endianness
 import java.io.FileOutputStream
 
-class MidiFile(private val data: MidiFileData) {
+class MidiFile(val data: MidiFileData) {
     private fun buildMidiFileData(): MidiFileData {
         return data
     }

@@ -45,19 +45,19 @@ fun main() {
     )*/
 
     val wavFile = WavFile(
-        AudioFormat.PCM, samples, sampleRate.toUInt()
+        AudioFormat.IEEE_FLOAT, samples, sampleRate.toUInt()
     ).withNormalizedSamples(1.0)
 
     wavFile.writeToFile("output.wav")
 
     val wavFile2 = WavFile.readFromFile("output.wav")
 
-    /*for (i in 0..<wavFile.samples.size) {
+    for (i in 0..<wavFile.samples.size) {
         for (j in 0..<wavFile.samples[i].size) {
-            if (wavFile.samples[i][j] != wavFile2.samples[i][j]) {
+            if (wavFile.samples[i][j] - wavFile2.samples[i][j] > 1e-3) {
                 println("Mismatch at $i, $j: ${wavFile.samples[i][j]} != ${wavFile2.samples[i][j]}")
             }
         }
-    }*/
+    }
 }
 

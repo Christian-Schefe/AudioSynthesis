@@ -5,9 +5,11 @@ import util.Endianness
 import java.io.FileInputStream
 
 class MidiFileReader {
+    private var runningStatus: UByte? = null
+
     fun readFromFile(filePath: String): MidiFileData {
         val inputStream = FileInputStream(filePath)
-        val reader = ByteReader(Endianness.LITTLE, inputStream.readAllBytes())
+        val reader = ByteReader(Endianness.BIG, inputStream.readAllBytes())
         val headerChunk = readHeaderChunk(reader)
         val tracks = mutableListOf<TrackChunk>()
         while (reader.bytesLeft() > 0) {
@@ -24,6 +26,7 @@ class MidiFileReader {
         val format = reader.readUShort()
         val numTracks = reader.readUShort()
         val division = readDivision(reader)
+        println("Format: $format, Num Tracks: $numTracks, Division: $division")
         return HeaderChunk(FormatType.fromCode(format), numTracks, division)
     }
 
@@ -46,6 +49,7 @@ class MidiFileReader {
         val size = reader.readUInt()
         val endBytesLeft = reader.bytesLeft() - size.toInt()
         val events = mutableListOf<TrackEvent>()
+        println("Track size: $size, End bytes left: $endBytesLeft")
         while (reader.bytesLeft() > endBytesLeft) {
             events.add(readTrackEvent(reader))
         }
@@ -54,27 +58,40 @@ class MidiFileReader {
 
     private fun readTrackEvent(reader: ByteReader): TrackEvent {
         val deltaTime = reader.readVarUInt()
-        val statusByte = reader.readUByte()
-        if (statusByte.toInt() == 0xFF) {
-            return TrackEvent(deltaTime, readMetaEvent(reader))
+        var statusByte = reader.readUByte()
+
+        if (statusByte.toInt() and 0x80 == 0) {
+            // Running status
+            statusByte = runningStatus ?: throw IllegalArgumentException("Invalid running status")
+        } else {
+            runningStatus = statusByte
         }
-        val midiEvent = when (statusByte.toInt() and 0xFF) {
-            0x80 -> NoteOffEvent(reader)
-            0x90 -> NoteOnEvent(reader)
-            0xFF -> readMetaEvent(reader)
-            else -> UnknownEvent.read(reader)
+
+        val channel = statusByte and 0x0Fu
+
+        val midiEvent = when (statusByte.toInt() and 0xF0) {
+            0x80 -> NoteOffEvent(channel, reader.readUByte(), reader.readUByte())
+            0x90 -> NoteOnEvent(channel, reader.readUByte(), reader.readUByte())
+            0xA0 -> PolyphonicKeyPressureEvent(channel, reader.readUByte(), reader.readUByte())
+            0xB0 -> ControlChangeEvent(channel, reader.readUByte(), reader.readUByte())
+            0xC0 -> ProgramChangeEvent(channel, reader.readUByte())
+            0xD0 -> ChannelPressureEvent(channel, reader.readUByte())
+            0xE0 -> PitchBendEvent(channel, PitchBendEvent.combineValues(reader.readUByte(), reader.readUByte()))
+            else -> readMetaEvent(reader)
         }
+        println("Delta time: $deltaTime, status byte: $statusByte -> $midiEvent")
         return TrackEvent(deltaTime, midiEvent)
     }
 
     private fun readMetaEvent(reader: ByteReader): MidiEvent {
         val type = reader.readUByte()
         val length = reader.readVarUInt()
+        println("type: $type, length: $length")
         val data = reader.readBytes(length.toInt())
 
         return when (type.toInt()) {
             0x51 -> SetTempoEvent.fromData(data)
-            else -> UnknownEvent(data)
+            else -> UnknownMetaEvent(data)
         }
     }
 }

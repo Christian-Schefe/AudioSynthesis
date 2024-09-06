@@ -6,7 +6,7 @@ import util.Endianness
 import java.io.FileOutputStream
 
 class WavFile(
-    private val audioFormat: AudioFormat, private val samples: Array<DoubleArray>, private val sampleRate: UInt
+    private val audioFormat: AudioFormat, val samples: Array<DoubleArray>, private val sampleRate: UInt
 ) {
     private val channelCount = samples.size
     private val channelSampleCount = samples[0].size
