@@ -45,26 +45,27 @@ class MidiFileReader {
 
     private fun readTrackChunk(reader: ByteReader): TrackChunk {
         val id = reader.readString(4)
-        require(id == "MTrk") { "Invalid track chunk ID: $id" }
-        val size = reader.readUInt()
-        val endBytesLeft = reader.bytesLeft() - size.toInt()
+        require(id == "MTrk") { "Invalid track chunk ID: $id at ${reader.position()}" }
+        val size = reader.readUInt().toInt()
+        val subReader = reader.subReader(size)
         val events = mutableListOf<TrackEvent>()
-        println("Track size: $size, End bytes left: $endBytesLeft")
-        while (reader.bytesLeft() > endBytesLeft) {
-            events.add(readTrackEvent(reader))
+        println("Track size: $size")
+        while (subReader.bytesLeft() > 0) {
+            events.add(readTrackEvent(subReader))
         }
         return TrackChunk(events)
     }
 
     private fun readTrackEvent(reader: ByteReader): TrackEvent {
         val deltaTime = reader.readVarUInt()
-        var statusByte = reader.readUByte()
+        var statusByte = reader.peekUByte()
 
         if (statusByte.toInt() and 0x80 == 0) {
             // Running status
             statusByte = runningStatus ?: throw IllegalArgumentException("Invalid running status")
         } else {
             runningStatus = statusByte
+            reader.skipBytes(1)
         }
 
         val channel = statusByte and 0x0Fu

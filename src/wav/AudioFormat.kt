@@ -48,11 +48,11 @@ fun fromIeeeFloat(sample: Float): Double {
 }
 
 fun toALaw(sample: Double): Byte {
-    return 0.toByte()
+    return encodeALaw(sample.coerceIn(-1.0, 1.0))
 }
 
 fun fromALaw(sample: Byte): Double {
-    return 0.0
+    return decodeALaw(sample)
 }
 
 fun toMuLaw(sample: Double): Byte {

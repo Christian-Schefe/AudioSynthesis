@@ -1,16 +1,42 @@
 package util
 
-class ByteReader(private val endianness: Endianness, private val bytes: ByteArray) {
+class ByteReader(
+    private val endianness: Endianness, private val bytes: ByteArray, private val offset: Int, private val length: Int
+) {
+    init {
+        require(offset >= 0) { "Offset must be non-negative" }
+        require(length >= 0) { "Length must be non-negative" }
+        require(offset + length <= bytes.size) { "Offset + length must be less than or equal to the byte array size" }
+    }
+
     private var index = 0
 
+    constructor(endianness: Endianness, bytes: ByteArray) : this(endianness, bytes, 0, bytes.size)
+
     fun readByte(): Byte {
-        val result = bytes[index]
+        val result = peekByte()
         index++
         return result
     }
 
+    fun peekByte(): Byte {
+        if (index >= length) {
+            throw IndexOutOfBoundsException("No more bytes to read")
+        }
+        return bytes[offset + index]
+    }
+
+    fun skipBytes(count: Int) {
+        require(count <= bytesLeft()) { "Not enough bytes left: ${bytesLeft()}/$count" }
+        index += count
+    }
+
     fun readUByte(): UByte {
         return readByte().toUByte()
+    }
+
+    fun peekUByte(): UByte {
+        return peekByte().toUByte()
     }
 
     fun readUShort(): UShort {
@@ -73,11 +99,11 @@ class ByteReader(private val endianness: Endianness, private val bytes: ByteArra
 
     fun readVarUInt(): UInt {
         var value = 0u
-        var byte: UInt
+        var byte: UByte
         do {
-            byte = readUByte().toUInt()
-            value = (value shl 7) or (byte and 0x7Fu)
-        } while (byte and 0x80u != 0u)
+            byte = readUByte()
+            value = (value shl 7) or (byte and 0x7F.toUByte()).toUInt()
+        } while (byte and 0x80.toUByte() != 0.toUByte())
         return value
     }
 
@@ -86,19 +112,27 @@ class ByteReader(private val endianness: Endianness, private val bytes: ByteArra
     }
 
     fun readString(length: Int): String {
-        val string = bytes.copyOfRange(index, index + length).toString(Charsets.UTF_8)
-        index += length
-        return string
+        return readBytes(length).toString(Charsets.UTF_8)
     }
 
     fun bytesLeft(): Int {
-        return bytes.size - index
+        return length - index
+    }
+
+    fun position(): Int {
+        return index
     }
 
     fun readBytes(length: Int): ByteArray {
         require(length <= bytesLeft()) { "Not enough bytes left: ${bytesLeft()}/$length" }
-        val byteArray = bytes.copyOfRange(index, index + length)
+        val byteArray = bytes.copyOfRange(index + offset, index + offset + length)
         index += length
         return byteArray
+    }
+
+    fun subReader(length: Int): ByteReader {
+        val subReader = ByteReader(endianness, bytes, offset + index, length)
+        index += length
+        return subReader
     }
 }

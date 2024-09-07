@@ -45,7 +45,7 @@ fun main() {
     )*/
 
     val wavFile = WavFile(
-        AudioFormat.MU_LAW, samples, sampleRate.toUInt()
+        AudioFormat.IEEE_FLOAT, samples, sampleRate.toUInt()
     ).withNormalizedSamples(1.0)
 
     wavFile.writeToFile("output.wav")
@@ -58,12 +58,6 @@ fun main() {
                 println("Mismatch at $i, $j: ${wavFile.samples[i][j]} != ${wavFile2.samples[i][j]}")
             }
         }
-    }
-
-    for (i in Byte.MIN_VALUE..Byte.MAX_VALUE) {
-        val decoded = decodeMuLaw(i.toByte())
-        val encoded = encodeMuLaw(decoded)
-        if (encoded != i.toByte()) println("Mismatch at $i: $decoded, $encoded")
     }
 }
 
