@@ -106,13 +106,13 @@ data class SetTempoEvent(
         byteWriter.addByte(0xFFu)
         byteWriter.addByte(0x51u)
         byteWriter.addByte(3u)
-        byteWriter.addInt(microsecondsPerQuarterNote)
+        byteWriter.addInt(microsecondsPerQuarterNote, 3)
     }
 
     companion object {
         fun fromData(data: ByteArray): SetTempoEvent {
             require(data.size == 3) { "Invalid tempo data size" }
-            return SetTempoEvent(BitConverter.bitsToInt(data + byteArrayOf(0)))
+            return SetTempoEvent(BitConverter.bitsToInt(data.reversedArray() + byteArrayOf(0)))
         }
     }
 }

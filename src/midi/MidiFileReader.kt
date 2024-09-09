@@ -7,7 +7,7 @@ import java.io.FileInputStream
 class MidiFileReader {
     private var runningStatus: UByte? = null
 
-    fun readFromFile(filePath: String): MidiFileData {
+    fun readFromFile(filePath: String): MidiFile {
         val inputStream = FileInputStream(filePath)
         val reader = ByteReader(Endianness.BIG, inputStream.readAllBytes())
         val headerChunk = readHeaderChunk(reader)
@@ -15,7 +15,7 @@ class MidiFileReader {
         while (reader.bytesLeft() > 0) {
             tracks.add(readTrackChunk(reader))
         }
-        return MidiFileData(headerChunk, tracks)
+        return MidiFile(headerChunk, tracks)
     }
 
     private fun readHeaderChunk(reader: ByteReader): HeaderChunk {

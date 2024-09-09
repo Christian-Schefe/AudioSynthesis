@@ -24,8 +24,8 @@ class ByteWriter(private val endianness: Endianness) {
         addShort(value.toShort())
     }
 
-    fun addInt(value: Int) {
-        val arr = BitConverter.intToBits(value)
+    fun addInt(value: Int, byteLimit: Int = 4) {
+        val arr = BitConverter.intToBits(value).slice(0..<byteLimit).toByteArray()
         if (endianness == Endianness.LITTLE) {
             addBytes(arr)
         } else {
@@ -33,8 +33,8 @@ class ByteWriter(private val endianness: Endianness) {
         }
     }
 
-    fun addInt(value: UInt) {
-        addInt(value.toInt())
+    fun addInt(value: UInt, byteLimit: Int = 4) {
+        addInt(value.toInt(), byteLimit)
     }
 
     fun addLong(value: Long) {
