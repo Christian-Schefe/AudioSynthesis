@@ -1,6 +1,6 @@
 package wav
 
-import util.ByteReader
+import util.OldByteReader
 import util.Endianness
 import java.io.FileInputStream
 
@@ -8,12 +8,12 @@ import java.io.FileInputStream
 class WavFileReader {
     fun readWavFile(filePath: String): WavFileData {
         val inputStream = FileInputStream(filePath)
-        val reader = ByteReader(Endianness.LITTLE, inputStream.readAllBytes())
+        val reader = OldByteReader(Endianness.LITTLE, inputStream.readAllBytes())
         val riffChunk = readRiffChunk(reader)
         return WavFileData(riffChunk)
     }
 
-    private fun readRiffChunk(reader: ByteReader): RiffChunk {
+    private fun readRiffChunk(reader: OldByteReader): RiffChunk {
         val id = reader.readString(4)
         val size = reader.readUInt().toInt()
         require(size == reader.bytesLeft()) { "Invalid RIFF chunk size: $size - ${reader.bytesLeft()}" }
@@ -35,7 +35,7 @@ class WavFileReader {
         return RiffChunk(chunks)
     }
 
-    private fun readFmtChunk(reader: ByteReader): FmtChunk {
+    private fun readFmtChunk(reader: OldByteReader): FmtChunk {
         val size = reader.readUInt().toInt()
         require(size == 16 || size == 18 || size == 40) { "Invalid fmt chunk size" }
         val formatType = AudioFormat.fromCode(reader.readUShort())
@@ -61,14 +61,14 @@ class WavFileReader {
         return FmtChunk(formatType, numChannels, sampleRate, byteRate, blockAlign, bitsPerSample, fmtChunkExtension)
     }
 
-    private fun readFactChunk(reader: ByteReader): FactChunk {
+    private fun readFactChunk(reader: OldByteReader): FactChunk {
         val size = reader.readUInt().toInt()
         require(size == 4) { "Invalid fact chunk size" }
         val sampleLength = reader.readUInt()
         return FactChunk(sampleLength)
     }
 
-    private fun readDataChunk(reader: ByteReader): DataChunk {
+    private fun readDataChunk(reader: OldByteReader): DataChunk {
         val size = reader.readUInt().toInt()
         val data = reader.readBytes(size)
         if (size % 2 != 0) {

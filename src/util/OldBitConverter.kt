@@ -1,21 +1,24 @@
 package util
 
-class BitConverter {
+class OldBitConverter {
     companion object {
-        fun bitsToShort(byte1: UByte, byte2: UByte): UShort {
+        fun bitsToUShort(byte1: UByte, byte2: UByte): UShort {
             return (byte2.toInt() shl 8 or byte1.toInt()).toUShort()
         }
 
-        fun bitsToShort(array: ByteArray) = bitsToShort(array[0].toUByte(), array[1].toUByte())
+        fun bitsToUShort(array: ByteArray) = bitsToUShort(array[0].toUByte(), array[1].toUByte())
 
-        fun bitsToInt(byte1: UByte, byte2: UByte, byte3: UByte, byte4: UByte): UInt {
+        fun bitsToUInt(byte1: UByte, byte2: UByte, byte3: UByte, byte4: UByte): UInt {
             return (byte4.toUInt() shl 24) + (byte3.toUInt() shl 16) + (byte2.toUInt() shl 8) + byte1.toUInt()
         }
 
-        fun bitsToInt(array: ByteArray) =
-            bitsToInt(array[0].toUByte(), array[1].toUByte(), array[2].toUByte(), array[3].toUByte())
+        fun bitsToUInt(array: ByteArray) =
+            bitsToUInt(array[0].toUByte(), array[1].toUByte(), array[2].toUByte(), array[3].toUByte())
 
-        fun bitsToLong(
+        fun bitsToInt(array: ByteArray) = bitsToUInt(array).toInt()
+
+
+        fun bitsToULong(
             byte1: UByte,
             byte2: UByte,
             byte3: UByte,
@@ -28,7 +31,7 @@ class BitConverter {
             return (byte8.toULong() shl 56) or (byte7.toULong() shl 48) or (byte6.toULong() shl 40) or (byte5.toULong() shl 32) or (byte4.toULong() shl 24) or (byte3.toULong() shl 16) or (byte2.toULong() shl 8) or byte1.toULong()
         }
 
-        fun bitsToLong(array: ByteArray) = bitsToLong(
+        fun bitsToULong(array: ByteArray) = bitsToULong(
             array[0].toUByte(),
             array[1].toUByte(),
             array[2].toUByte(),
@@ -92,6 +95,19 @@ class BitConverter {
 
         fun intToVarInt(value: UInt): ByteArray {
             return intToVarInt(value.toInt())
+        }
+
+        fun intToBytes(value: Int, endianness: Endianness = Endianness.LITTLE, byteCount: Int = 4): ByteArray {
+            val bytes = ByteArray(byteCount)
+            var current = value
+            for (i in 0 until byteCount) {
+                bytes[i] = current.toByte()
+                current = current shr 8
+            }
+            return when (endianness) {
+                Endianness.BIG -> bytes.reversedArray()
+                Endianness.LITTLE -> bytes
+            }
         }
     }
 }

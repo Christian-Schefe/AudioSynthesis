@@ -1,13 +1,13 @@
 package wav
 
-import util.ByteReader
-import util.ByteWriter
+import util.OldByteReader
+import util.OldByteWriter
 
 enum class AudioFormat(
     val code: UShort,
     val bytesPerSample: UInt,
-    val writeSample: (Double, ByteWriter) -> Unit,
-    val readSample: (ByteReader) -> Double
+    val writeSample: (Double, OldByteWriter) -> Unit,
+    val readSample: (OldByteReader) -> Double
 ) {
     PCM(1u,
         2u,

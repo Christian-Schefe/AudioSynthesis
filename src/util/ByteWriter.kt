@@ -7,51 +7,16 @@ class ByteWriter(private val endianness: Endianness) {
         bytes.add(value)
     }
 
-    fun addByte(value: UByte) {
-        addByte(value.toByte())
+    fun addShort(value: Short, byteCount: Int = 2) {
+        addBytes(ByteConverter.shortToBytes(value, endianness, byteCount))
     }
 
-    fun addShort(value: Short) {
-        val arr = BitConverter.shortToBits(value)
-        if (endianness == Endianness.LITTLE) {
-            addBytes(arr)
-        } else {
-            addBytes(arr.reversedArray())
-        }
-    }
-
-    fun addShort(value: UShort) {
-        addShort(value.toShort())
-    }
-
-    fun addInt(value: Int, byteLimit: Int = 4) {
-        val arr = BitConverter.intToBits(value).slice(0..<byteLimit).toByteArray()
-        if (endianness == Endianness.LITTLE) {
-            addBytes(arr)
-        } else {
-            addBytes(arr.reversedArray())
-        }
-    }
-
-    fun addInt(value: UInt, byteLimit: Int = 4) {
-        addInt(value.toInt(), byteLimit)
-    }
-
-    fun addLong(value: Long) {
-        val arr = BitConverter.longToBits(value)
-        if (endianness == Endianness.LITTLE) {
-            addBytes(arr)
-        } else {
-            addBytes(arr.reversedArray())
-        }
-    }
-
-    fun addLong(value: ULong) {
-        addLong(value.toLong())
+    fun addInt(value: Int, byteCount: Int = 4) {
+        addBytes(ByteConverter.intToBytes(value, endianness, byteCount))
     }
 
     fun addFloat(value: Float) {
-        addInt(value.toRawBits())
+        addBytes(ByteConverter.intToBytes(value.toRawBits(), Endianness.LITTLE))
     }
 
     fun addString(value: String) {
@@ -65,11 +30,7 @@ class ByteWriter(private val endianness: Endianness) {
     }
 
     fun addVarInt(value: Int) {
-        addBytes(BitConverter.intToVarInt(value))
-    }
-
-    fun addVarInt(value: UInt) {
-        addVarInt(value.toInt())
+        addBytes(ByteConverter.intToVarInt(value))
     }
 
     fun toByteArray(): ByteArray {

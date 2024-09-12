@@ -1,22 +1,23 @@
 package midi.abstraction
 
 import midi.raw.*
+import util.OldBitConverter
 
 class Midi(val events: List<List<Pair<Int, MidiEvent>>>, val tempoChanges: List<Pair<Int, TempoChangeEvent>>) {
-    fun toRawMidi(): MidiFile {
-        val division = TicksPerQuarterNote(480u)
-        val format = FormatType.MULTIPLE_TRACKS
+    fun toRawMidi(): RawMidi {
+        val division = Division.TicksPerQuarterNote(480)
+        val format = MidiFileFormat.MULTIPLE_TRACKS
         var prevEventTime = 0
         val tracks = events.map { trackEvents ->
             val events = trackEvents.toList().sortedBy { it.first }.map { (time, event) ->
                 val delta = time - prevEventTime
                 prevEventTime = time
-                val rawMidiEvent = event.toRawEvent()
-                TrackEvent(delta.toUInt(), rawMidiEvent)
+                val rawMidiEvent = event.toRawEvent(delta)
+                rawMidiEvent
             }
-            TrackChunk(events)
+            RawTrackChunk(events)
         }
-        return MidiFile(format, division, tracks)
+        return RawMidi(format, division, tracks)
     }
 
     fun writeToFile(filePath: String) {
@@ -24,7 +25,7 @@ class Midi(val events: List<List<Pair<Int, MidiEvent>>>, val tempoChanges: List<
     }
 
     companion object {
-        fun fromRawMidi(file: MidiFile): Midi {
+        fun fromRawMidi(file: RawMidi): Midi {
             val tracks = mutableListOf<List<Pair<Int, MidiEvent>>>()
             val tempoChanges = mutableListOf<Pair<Int, TempoChangeEvent>>()
 
@@ -32,21 +33,43 @@ class Midi(val events: List<List<Pair<Int, MidiEvent>>>, val tempoChanges: List<
                 val events = mutableListOf<Pair<Int, MidiEvent>>()
                 var time = 0
                 for (event in track.events) {
-                    time += event.deltaTime.toInt()
-                    when (val rawEvent = event.event) {
-                        is midi.raw.NoteOnEvent -> events.add(
-                            time to NoteOnEvent(
-                                rawEvent.channel.toInt(), rawEvent.key.toInt(), rawEvent.velocity.toDouble() / 127
-                            )
-                        )
+                    time += event.deltaTime
+                    when (event) {
+                        is RawChannelVoiceMessage -> {
+                            when (event.status) {
+                                ChannelMessageStatus.NOTE_ON -> {
+                                    val key = event.data[0].toInt()
+                                    val velocity = event.data[1].toInt() / 127.0
+                                    events.add(time to NoteOnEvent(event.channel.toInt(), key, velocity))
+                                }
 
-                        is midi.raw.NoteOffEvent -> events.add(
-                            time to NoteOffEvent(rawEvent.channel.toInt(), rawEvent.key.toInt())
-                        )
+                                ChannelMessageStatus.NOTE_OFF -> {
+                                    val key = event.data[0].toInt()
+                                    events.add(time to NoteOffEvent(event.channel.toInt(), key))
+                                }
 
-                        is SetTempoEvent -> tempoChanges.add(
-                            time to TempoChangeEvent(60_000_000.0 / rawEvent.microsecondsPerQuarterNote.toInt())
-                        )
+                                else -> {
+                                    // Ignore other channel messages
+                                }
+                            }
+                        }
+
+                        is RawMetaEvent -> {
+                            when (event.type) {
+                                MetaEventStatus.SET_TEMPO -> {
+                                    val bpm = 60_000_000.0 / OldBitConverter.bitsToInt(event.data)
+                                    tempoChanges.add(time to TempoChangeEvent(bpm))
+                                }
+
+                                else -> {
+                                    // Ignore other meta events
+                                }
+                            }
+                        }
+
+                        else -> {
+                            // Ignore other events
+                        }
                     }
                 }
                 tracks.add(events)
@@ -56,7 +79,7 @@ class Midi(val events: List<List<Pair<Int, MidiEvent>>>, val tempoChanges: List<
         }
 
         fun readFromFile(filePath: String): Midi {
-            return fromRawMidi(MidiFile.readFromFile(filePath))
+            return fromRawMidi(RawMidi.readFromFile(filePath))
         }
     }
 }

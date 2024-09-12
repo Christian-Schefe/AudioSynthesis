@@ -1,7 +1,7 @@
 package wav
 
-import util.ByteWriter
-import util.ByteReader
+import util.OldByteWriter
+import util.OldByteReader
 import util.Endianness
 import java.io.FileOutputStream
 
@@ -16,7 +16,7 @@ class WavFile(
     }
 
     private fun computeAudioData(): ByteArray {
-        val byteWriter = ByteWriter(Endianness.LITTLE)
+        val byteWriter = OldByteWriter(Endianness.LITTLE)
         for (i in 0..<channelSampleCount) {
             for (j in samples.indices) {
                 audioFormat.writeSample(samples[j][i].coerceIn(-1.0, 1.0), byteWriter)
@@ -54,7 +54,7 @@ class WavFile(
     }
 
     fun writeToFile(filePath: String) {
-        val byteWriter = ByteWriter(Endianness.LITTLE)
+        val byteWriter = OldByteWriter(Endianness.LITTLE)
 
         buildWavFileData().write(byteWriter)
 
@@ -64,7 +64,7 @@ class WavFile(
     }
 
     companion object {
-        private fun parseSamples(audioFormat: AudioFormat, reader: ByteReader, channelCount: Int): Array<DoubleArray> {
+        private fun parseSamples(audioFormat: AudioFormat, reader: OldByteReader, channelCount: Int): Array<DoubleArray> {
             val samples = Array(channelCount) { mutableListOf<Double>() }
             var i = 0
             while (reader.bytesLeft() > 0) {
@@ -77,7 +77,7 @@ class WavFile(
         private fun fromWavFileData(data: WavFileData): WavFile {
             val fmtChunk = data.riffChunk.getChunk(WavChunkType.FMT) as FmtChunk
             val dataChunk = data.riffChunk.getChunk(WavChunkType.DATA) as DataChunk
-            val reader = ByteReader(Endianness.LITTLE, dataChunk.audioData)
+            val reader = OldByteReader(Endianness.LITTLE, dataChunk.audioData)
             val channelCount = fmtChunk.numChannels.toInt()
             val samples = parseSamples(fmtChunk.formatType, reader, channelCount)
             return WavFile(fmtChunk.formatType, samples, fmtChunk.sampleRate)
