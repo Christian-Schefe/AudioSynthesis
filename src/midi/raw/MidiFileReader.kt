@@ -1,4 +1,4 @@
-package midi
+package midi.raw
 
 import util.ByteReader
 import util.Endianness

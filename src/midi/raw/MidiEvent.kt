@@ -1,7 +1,6 @@
-package midi
+package midi.raw
 
 import util.BitConverter
-import util.ByteReader
 import util.ByteWriter
 
 abstract class MidiEvent {
@@ -10,7 +9,7 @@ abstract class MidiEvent {
 }
 
 data class NoteOffEvent(
-    private val channel: UByte, private val key: UByte, private val velocity: UByte
+    val channel: UByte, val key: UByte, private val velocity: UByte
 ) : MidiEvent() {
     override val size: UInt = 3u
 
@@ -22,7 +21,7 @@ data class NoteOffEvent(
 }
 
 data class NoteOnEvent(
-    private val channel: UByte, private val key: UByte, private val velocity: UByte
+    val channel: UByte, val key: UByte, val velocity: UByte
 ) : MidiEvent() {
     override val size: UInt = 3u
 
@@ -98,7 +97,7 @@ data class PitchBendEvent(
 }
 
 data class SetTempoEvent(
-    private val microsecondsPerQuarterNote: UInt
+    val microsecondsPerQuarterNote: UInt
 ) : MidiEvent() {
     override val size: UInt = 3u
 

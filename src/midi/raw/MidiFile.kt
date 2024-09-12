@@ -1,4 +1,4 @@
-package midi
+package midi.raw
 
 import util.BitConverter
 import util.ByteWriter
@@ -80,7 +80,7 @@ class TrackChunk(
 }
 
 data class TrackEvent(
-    private val deltaTime: UInt, private val event: MidiEvent
+    val deltaTime: UInt, val event: MidiEvent
 ) {
     val size: UInt = BitConverter.intToVarInt(deltaTime).size.toUInt() + event.size
 

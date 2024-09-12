@@ -1,4 +1,4 @@
-package midi
+package midi.raw
 
 fun main() {
     val midi = MidiFile.readFromFile("test_data/simple.mid")
