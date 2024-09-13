@@ -89,6 +89,7 @@ class SongPlayer(val soundFactory: () -> AudioNode, val song: Song, val trackNum
             }
             val voice = freeVoicesQueue.removeFirst()
             freeVoicesSet.remove(voice)
+            voices[voice].reset()
 
             voiceData[voice] = Triple(Instrument.midiNoteToFreq(note.key), note.velocity, note.time + note.duration)
             trackPointer++

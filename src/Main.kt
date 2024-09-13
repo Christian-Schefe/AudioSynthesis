@@ -1,6 +1,5 @@
 import instruments.SongPlayer
-import instruments.flute
-import instruments.piano
+import instruments.*
 import midi.abstraction.Midi
 import nodes.*
 import song.SongConverter
@@ -10,13 +9,20 @@ import kotlin.time.measureTimedValue
 fun main() {
     val sampleRate = 44100
     val ctx = Context(0, sampleRate)
-    val midi = Midi.readFromFile("test_data/Etude_Heroique.mid")
+    val midi = Midi.readFromFile("test_data/castle.mid")
     val song = SongConverter().fromMidi(midi)
 
     var node: AudioNode? = null
 
-    for (track in song.tracks.indices) {
-        val trackNode = SongPlayer({ piano(ctx.random) }, song, track, 36)
+    val factories = mapOf(0 to { piano(ctx.random) * ConstantNode(6.0, 6.0) },
+        1 to { piano(ctx.random) * ConstantNode(6.0, 6.0) },
+        2 to { violin(ctx.random) },
+        3 to { flute(ctx.random) },
+        4 to { violin(ctx.random) })
+
+    //for (track in song.tracks.indices) {
+    for ((track, factory) in factories) {
+        val trackNode = SongPlayer(factory, song, track, 36)
         if (node == null) {
             node = trackNode
         } else {

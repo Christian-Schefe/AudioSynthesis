@@ -1,7 +1,6 @@
 package nodes
 
-import kotlin.math.PI
-import kotlin.math.sin
+import kotlin.math.*
 
 
 class OscillatorNode(private val oscillator: (Double) -> Double, private val initialPhase: Double = 0.0) :
@@ -42,6 +41,32 @@ class OscillatorNode(private val oscillator: (Double) -> Double, private val ini
             OscillatorNode(
                 { if (it < 0.25) 4 * it else if (it < 0.75) 2 - 4 * it else -4 + 4 * it }, initialPhase
             ).run {
+                return if (freq != null) (freq pipe this) else this
+            }
+        }
+
+        fun saw(freq: Double? = null, initialPhase: Double = 0.0): AudioNode {
+            OscillatorNode({ 2 * it - 1 }, initialPhase).run {
+                return if (freq != null) (freq pipe this) else this
+            }
+        }
+
+        fun softSaw(freq: Double? = null, initialPhase: Double = 0.0): AudioNode {
+            val func = { t: Double ->
+                val t2 = 2 * t - 1
+                t2 * (1 - t2.pow(12.0))
+            }
+            OscillatorNode(func, initialPhase).run {
+                return if (freq != null) (freq pipe this) else this
+            }
+        }
+
+        fun softSquare(freq: Double? = null, initialPhase: Double = 0.0): AudioNode {
+            val func = { t: Double ->
+                val t2 = 4 * t + 1
+                2 * PI * atan(14 * cos(t2 * PI * 0.5))
+            }
+            OscillatorNode(func, initialPhase).run {
                 return if (freq != null) (freq pipe this) else this
             }
         }
