@@ -24,7 +24,7 @@ class RawHeaderChunk(
 
 class RawTrackChunk(
     val events: List<RawMessage>
-) : RawChunk(RawChunkType.MTrk, events.sumOf { it.size }) {
+) : RawChunk(RawChunkType.MTrk, events.sumOf { it.totalSize }) {
     override fun write(byteWriter: ByteWriter) {
         super.write(byteWriter)
         events.forEach { it.write(byteWriter) }

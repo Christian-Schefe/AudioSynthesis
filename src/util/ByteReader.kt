@@ -31,12 +31,12 @@ class ByteReader(
         index += count
     }
 
-    fun readShort(): Short {
-        return ByteConverter.bytesToShort(readBytes(2), endianness)
+    fun readShort(endiannessOverride: Endianness? = null): Short {
+        return ByteConverter.bytesToShort(readBytes(2), endiannessOverride ?: endianness)
     }
 
-    fun readInt(): Int {
-        return ByteConverter.bytesToInt(readBytes(4), endianness)
+    fun readInt(endiannessOverride: Endianness? = null): Int {
+        return ByteConverter.bytesToInt(readBytes(4), endiannessOverride ?: endianness)
     }
 
     fun readFloat(): Float {
@@ -47,9 +47,9 @@ class ByteReader(
         var result = 0
         var shift = 0
         while (true) {
-            val byte = readByte()
-            result = result or ((byte.toInt() and 0x7F) shl shift)
-            if ((byte.toInt() and 0x80) == 0) {
+            val byte = readByte().toInt() and 0xFF
+            result = (result shl 7) or (byte and 0x7F)
+            if ((byte and 0x80) == 0) {
                 return result
             }
             shift += 7

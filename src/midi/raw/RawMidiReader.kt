@@ -1,15 +1,15 @@
 package midi.raw
 
-import util.OldByteReader
+import util.ByteReader
 import util.Endianness
 import java.io.FileInputStream
 
 class RawMidiReader {
-    private var runningStatus: Byte? = null
+    private var runningStatus: Int? = null
 
     fun readFromFile(filePath: String): RawMidi {
         val inputStream = FileInputStream(filePath)
-        val reader = OldByteReader(Endianness.BIG, inputStream.readAllBytes())
+        val reader = ByteReader(Endianness.BIG, inputStream.readAllBytes())
         val headerChunk = readHeaderChunk(reader)
         val tracks = mutableListOf<RawTrackChunk>()
         while (reader.bytesLeft() > 0) {
@@ -18,7 +18,7 @@ class RawMidiReader {
         return RawMidi(headerChunk, tracks)
     }
 
-    private fun readHeaderChunk(reader: OldByteReader): RawHeaderChunk {
+    private fun readHeaderChunk(reader: ByteReader): RawHeaderChunk {
         val id = reader.readString(4)
         require(id == "MThd") { "Invalid header chunk ID: $id" }
         val size = reader.readInt()
@@ -30,7 +30,7 @@ class RawMidiReader {
         return RawHeaderChunk(MidiFileFormat.fromCode(format), numTracks, division)
     }
 
-    private fun readDivision(reader: OldByteReader): Division {
+    private fun readDivision(reader: ByteReader): Division {
         val division = reader.readShort().toInt()
         val divisionType = division and 0x8000
         val divisionValue = division and 0x7FFF
@@ -43,7 +43,7 @@ class RawMidiReader {
         }
     }
 
-    private fun readTrackChunk(reader: OldByteReader): RawTrackChunk {
+    private fun readTrackChunk(reader: ByteReader): RawTrackChunk {
         val id = reader.readString(4)
         require(id == "MTrk") { "Invalid track chunk ID: $id at ${reader.position()}" }
         val size = reader.readInt()
@@ -56,31 +56,34 @@ class RawMidiReader {
         return RawTrackChunk(events)
     }
 
-    private fun readTrackEvent(reader: OldByteReader): RawMessage {
+    private fun readTrackEvent(reader: ByteReader): RawMessage {
         val deltaTime = reader.readVarInt()
-        var statusByte = reader.peekByte()
+        var statusByte = reader.peekByte().toInt() and 0xFF
 
-        if (statusByte.toInt() and 0x80 == 0) {
+        if (statusByte and 0x80 == 0) {
             statusByte = runningStatus ?: throw IllegalArgumentException("Invalid running status")
         } else {
             runningStatus = statusByte
             reader.skipBytes(1)
         }
 
-        if (statusByte.toInt() == 0xFF) {
+        if (statusByte == 0xFF) {
             val type = MetaEventStatus.fromByte(reader.readByte())
             val length = reader.readVarInt()
             val data = reader.readBytes(length)
+            println("Meta event(Type: $type, Length: $length, Data: ${data.toList()})")
             return RawMetaEvent(deltaTime, type, data)
-        } else if (statusByte.toInt() and 0xF0 != 0xF0) {
-            val channel = statusByte.toInt() and 0x0F
-            val status = ChannelMessageStatus.fromByte(statusByte)
+        } else if (statusByte and 0xF0 != 0xF0) {
+            val channel = statusByte and 0x0F
+            val status = ChannelMessageStatus.fromByte(statusByte.toByte())
             val size = status.dataSize
             val data = reader.readBytes(size)
+            println("Channel message(Channel: $channel, Status: $status, Data: ${data.toList()})")
             return RawChannelVoiceMessage(deltaTime, status, channel.toByte(), data)
         } else {
-            val status = SystemMessageStatus.fromByte(statusByte)
+            val status = SystemMessageStatus.fromByte(statusByte.toByte())
             val size = status.dataSize
+            println("System message(Status: $status, Size: $size)")
             if (size != null) {
                 val data = reader.readBytes(size)
                 return RawSystemMessage(deltaTime, status, data)

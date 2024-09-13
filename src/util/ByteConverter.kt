@@ -2,8 +2,12 @@ package util
 
 class ByteConverter {
     companion object {
+        fun shiftLeft(value: Byte, shift: Int): Int {
+            return (value.toInt() and 0xFF) shl shift
+        }
+
         fun bytesToShort(lowByte: Byte, highByte: Byte): Short {
-            return (lowByte.toInt() or (highByte.toInt() shl 8)).toShort()
+            return (shiftLeft(lowByte, 0) or shiftLeft(highByte, 8)).toShort()
         }
 
         fun bytesToShort(array: ByteArray, endianness: Endianness): Short {
@@ -14,7 +18,9 @@ class ByteConverter {
         }
 
         fun bytesToInt(lowByte: Byte, lowMiddleByte: Byte, highMiddleByte: Byte, highByte: Byte): Int {
-            return lowByte.toInt() or (lowMiddleByte.toInt() shl 8) or (highMiddleByte.toInt() shl 16) or (highByte.toInt() shl 24)
+            return (shiftLeft(lowByte, 0) or shiftLeft(lowMiddleByte, 8) or shiftLeft(highMiddleByte, 16) or shiftLeft(
+                highByte, 24
+            ))
         }
 
         fun bytesToInt(array: ByteArray, endianness: Endianness): Int {
@@ -43,18 +49,13 @@ class ByteConverter {
         }
 
         fun intToVarInt(value: Int): ByteArray {
-            val bytes = mutableListOf<Byte>()
-            var v = value
-            while (true) {
-                val byte = (v and 0x7F).toByte()
+            val bytes = mutableListOf((value and 0x7F).toByte())
+            var v = value ushr 7
+            while (v != 0) {
+                bytes.add(((v and 0x7F) or 0x80).toByte())
                 v = v ushr 7
-                if (v == 0) {
-                    bytes.add(byte)
-                    break
-                } else {
-                    bytes.add((byte.toInt() or 0x80).toByte())
-                }
             }
+            bytes.reverse()
             return bytes.toByteArray()
         }
     }

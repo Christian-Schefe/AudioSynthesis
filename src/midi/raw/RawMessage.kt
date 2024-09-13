@@ -6,9 +6,10 @@ import util.ByteWriter
 open class RawMessage(val deltaTime: Int, size: Int) {
     init {
         require(deltaTime >= 0) { "Delta time must be non-negative" }
+        println("Delta Time: $deltaTime, Size: ${size + ByteConverter.intToVarInt(deltaTime).size}")
     }
 
-    val size = size + ByteConverter.intToVarInt(size).size
+    val totalSize = size + ByteConverter.intToVarInt(deltaTime).size
 
     open fun write(byteWriter: ByteWriter) {
         byteWriter.addVarInt(deltaTime)
