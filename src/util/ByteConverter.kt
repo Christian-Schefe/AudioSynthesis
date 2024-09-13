@@ -11,10 +11,10 @@ class ByteConverter {
         }
 
         fun bytesToShort(array: ByteArray, endianness: Endianness): Short {
-            return when (endianness) {
-                Endianness.LITTLE -> bytesToShort(array[0], array[1])
-                Endianness.BIG -> bytesToShort(array[1], array[0])
-            }
+            val arr = if (endianness == Endianness.BIG) array.reversedArray() else array
+            val b0 = if (arr.size > 0) arr[0] else 0
+            val b1 = if (arr.size > 1) arr[1] else 0
+            return bytesToShort(b0, b1)
         }
 
         fun bytesToInt(lowByte: Byte, lowMiddleByte: Byte, highMiddleByte: Byte, highByte: Byte): Int {
@@ -24,10 +24,12 @@ class ByteConverter {
         }
 
         fun bytesToInt(array: ByteArray, endianness: Endianness): Int {
-            return when (endianness) {
-                Endianness.LITTLE -> bytesToInt(array[0], array[1], array[2], array[3])
-                Endianness.BIG -> bytesToInt(array[3], array[2], array[1], array[0])
-            }
+            val arr = if (endianness == Endianness.BIG) array.reversedArray() else array
+            val b0 = if (arr.size > 0) arr[0] else 0
+            val b1 = if (arr.size > 1) arr[1] else 0
+            val b2 = if (arr.size > 2) arr[2] else 0
+            val b3 = if (arr.size > 3) arr[3] else 0
+            return bytesToInt(b0, b1, b2, b3)
         }
 
         fun shortToBytes(value: Short, endianness: Endianness, byteCount: Int = 2): ByteArray {

@@ -1,21 +1,32 @@
 package midi.abstraction
 
 import midi.raw.*
-import util.OldBitConverter
 
-class Midi(val events: List<List<Pair<Int, MidiEvent>>>, val tempoChanges: List<Pair<Int, TempoChangeEvent>>) {
+data class Timed<out T>(val time: Int, val value: T)
+
+class Midi(
+    val tickRate: Int, val events: List<List<Timed<MidiEvent>>>, val tempoChanges: List<Timed<TempoChangeEvent>>
+) {
     fun toRawMidi(): RawMidi {
-        val division = Division.TicksPerQuarterNote(480)
+        val division = Division.TicksPerQuarterNote(tickRate.toShort())
         val format = MidiFileFormat.MULTIPLE_TRACKS
-        var prevEventTime = 0
-        val tracks = events.map { trackEvents ->
-            val events = trackEvents.toList().sortedBy { it.first }.map { (time, event) ->
-                val delta = time - prevEventTime
-                prevEventTime = time
-                val rawMidiEvent = event.toRawEvent(delta)
-                rawMidiEvent
+        val tracks = mutableListOf<RawTrackChunk>()
+        for (i in events.indices) {
+            val eventList = mutableListOf<Timed<MidiEvent>>()
+            eventList.addAll(events[i])
+            if (i == 0) {
+                eventList.addAll(tempoChanges)
             }
-            RawTrackChunk(events)
+            eventList.sortBy { it.time }
+
+            val trackEvents = mutableListOf<RawMessage>()
+            var prevEventTime = 0
+            for (event in eventList) {
+                val deltaTime = event.time - prevEventTime
+                prevEventTime = event.time
+                trackEvents.add(event.value.toRawEvent(deltaTime))
+            }
+            tracks.add(RawTrackChunk(trackEvents))
         }
         return RawMidi(format, division, tracks)
     }
@@ -24,58 +35,34 @@ class Midi(val events: List<List<Pair<Int, MidiEvent>>>, val tempoChanges: List<
         toRawMidi().writeToFile(filePath)
     }
 
+    override fun toString(): String {
+        return "Midi(events=$events, tempoChanges=$tempoChanges)"
+    }
+
     companion object {
         fun fromRawMidi(file: RawMidi): Midi {
-            val tracks = mutableListOf<List<Pair<Int, MidiEvent>>>()
-            val tempoChanges = mutableListOf<Pair<Int, TempoChangeEvent>>()
+            val tracks = mutableListOf<List<Timed<MidiEvent>>>()
+            val tempoChanges = mutableListOf<Timed<TempoChangeEvent>>()
 
             for (track in file.tracks) {
-                val events = mutableListOf<Pair<Int, MidiEvent>>()
+                val events = mutableListOf<Timed<MidiEvent>>()
                 var time = 0
                 for (event in track.events) {
                     time += event.deltaTime
-                    when (event) {
-                        is RawChannelVoiceMessage -> {
-                            when (event.status) {
-                                ChannelMessageStatus.NOTE_ON -> {
-                                    val key = event.data[0].toInt()
-                                    val velocity = event.data[1].toInt() / 127.0
-                                    events.add(time to NoteOnEvent(event.channel.toInt(), key, velocity))
-                                }
-
-                                ChannelMessageStatus.NOTE_OFF -> {
-                                    val key = event.data[0].toInt()
-                                    events.add(time to NoteOffEvent(event.channel.toInt(), key))
-                                }
-
-                                else -> {
-                                    // Ignore other channel messages
-                                }
-                            }
-                        }
-
-                        is RawMetaEvent -> {
-                            when (event.type) {
-                                MetaEventStatus.SET_TEMPO -> {
-                                    val bpm = 60_000_000.0 / OldBitConverter.bitsToInt(event.data)
-                                    tempoChanges.add(time to TempoChangeEvent(bpm))
-                                }
-
-                                else -> {
-                                    // Ignore other meta events
-                                }
-                            }
-                        }
-
-                        else -> {
-                            // Ignore other events
+                    MidiEvent.fromRawMessage(event)?.let { midiEvent ->
+                        if (midiEvent is TempoChangeEvent) {
+                            tempoChanges.add(Timed(time, midiEvent))
+                        } else {
+                            events.add(Timed(time, midiEvent))
                         }
                     }
                 }
                 tracks.add(events)
             }
 
-            return Midi(tracks, tempoChanges)
+            val tickRate = file.headerChunk.division.getTickRate()
+
+            return Midi(tickRate, tracks, tempoChanges)
         }
 
         fun readFromFile(filePath: String): Midi {

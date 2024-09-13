@@ -39,6 +39,10 @@ class RawMidi(val headerChunk: RawHeaderChunk, val tracks: List<RawTrackChunk>) 
         fileOutputStream.write(byteWriter.toByteArray())
         fileOutputStream.close()
     }
+    
+    override fun toString(): String {
+        return "RawMidi(headerChunk=$headerChunk, tracks=$tracks)"
+    }
 
     companion object {
         fun readFromFile(filePath: String): RawMidi {

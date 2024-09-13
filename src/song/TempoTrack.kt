@@ -2,6 +2,10 @@ package song
 
 class TempoTrack(tempoChanges: List<TempoChange>) {
     val tempoChanges = tempoChanges.sortedBy { it.time }
+
+    override fun toString(): String {
+        return "TempoTrack(tempoChanges=$tempoChanges)"
+    }
 }
 
 data class TempoChange(val time: Double, val tempo: Double) {

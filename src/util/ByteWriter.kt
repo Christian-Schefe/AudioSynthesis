@@ -1,6 +1,6 @@
 package util
 
-class ByteWriter(private val endianness: Endianness) {
+class ByteWriter(val endianness: Endianness) {
     private val bytes = mutableListOf<Byte>()
 
     fun addByte(value: Byte) {

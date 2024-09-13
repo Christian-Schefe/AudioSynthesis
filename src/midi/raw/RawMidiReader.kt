@@ -26,7 +26,6 @@ class RawMidiReader {
         val format = reader.readShort()
         val numTracks = reader.readShort()
         val division = readDivision(reader)
-        println("Format: $format, Num Tracks: $numTracks, Division: $division")
         return RawHeaderChunk(MidiFileFormat.fromCode(format), numTracks, division)
     }
 
@@ -49,7 +48,6 @@ class RawMidiReader {
         val size = reader.readInt()
         val subReader = reader.subReader(size)
         val events = mutableListOf<RawMessage>()
-        println("Track size: $size")
         while (subReader.bytesLeft() > 0) {
             events.add(readTrackEvent(subReader))
         }
@@ -71,19 +69,16 @@ class RawMidiReader {
             val type = MetaEventStatus.fromByte(reader.readByte())
             val length = reader.readVarInt()
             val data = reader.readBytes(length)
-            println("Meta event(Type: $type, Length: $length, Data: ${data.toList()})")
             return RawMetaEvent(deltaTime, type, data)
         } else if (statusByte and 0xF0 != 0xF0) {
             val channel = statusByte and 0x0F
             val status = ChannelMessageStatus.fromByte(statusByte.toByte())
             val size = status.dataSize
             val data = reader.readBytes(size)
-            println("Channel message(Channel: $channel, Status: $status, Data: ${data.toList()})")
             return RawChannelVoiceMessage(deltaTime, status, channel.toByte(), data)
         } else {
             val status = SystemMessageStatus.fromByte(statusByte.toByte())
             val size = status.dataSize
-            println("System message(Status: $status, Size: $size)")
             if (size != null) {
                 val data = reader.readBytes(size)
                 return RawSystemMessage(deltaTime, status, data)

@@ -3,31 +3,49 @@ package midi.raw
 import util.ByteWriter
 
 open class RawChunk(
-    private var type: RawChunkType, var size: Int
+    private var type: RawChunkType
 ) {
     open fun write(byteWriter: ByteWriter) {
         byteWriter.addString(type.id)
-        byteWriter.addInt(size)
     }
 }
 
 class RawHeaderChunk(
     val format: MidiFileFormat, private val numTracks: Short, val division: Division
-) : RawChunk(RawChunkType.MThd, 6) {
+) : RawChunk(RawChunkType.MThd) {
     override fun write(byteWriter: ByteWriter) {
         super.write(byteWriter)
+        byteWriter.addInt(6)
         byteWriter.addShort(format.code)
         byteWriter.addShort(numTracks)
         division.write(byteWriter)
+    }
+
+    override fun toString(): String {
+        return "RawHeaderChunk(format=$format, numTracks=$numTracks, division=$division)"
     }
 }
 
 class RawTrackChunk(
     val events: List<RawMessage>
-) : RawChunk(RawChunkType.MTrk, events.sumOf { it.totalSize }) {
+) : RawChunk(RawChunkType.MTrk) {
     override fun write(byteWriter: ByteWriter) {
         super.write(byteWriter)
-        events.forEach { it.write(byteWriter) }
+        val subWriter = ByteWriter(byteWriter.endianness)
+        var runningStatusByte = 0.toByte()
+        events.forEach {
+            when (it) {
+                is RawChannelVoiceMessage -> runningStatusByte = it.writeRunningStatus(subWriter, runningStatusByte)
+                else -> it.write(subWriter)
+            }
+        }
+        val data = subWriter.toByteArray()
+        byteWriter.addInt(data.size)
+        byteWriter.addBytes(data)
+    }
+
+    override fun toString(): String {
+        return "RawTrackChunk(events=$events)"
     }
 }
 
@@ -45,10 +63,20 @@ enum class MidiFileFormat(val code: Short) {
 
 abstract class Division {
     abstract fun write(byteWriter: ByteWriter)
+    abstract fun getTickRate(): Int
+    abstract fun calculateBPM(tempo: Int): Double
 
     data class TicksPerQuarterNote(private val ticks: Short) : Division() {
         override fun write(byteWriter: ByteWriter) {
             byteWriter.addShort((ticks.toInt() and 0x7FFF).toShort())
+        }
+
+        override fun getTickRate(): Int {
+            return ticks.toInt()
+        }
+
+        override fun calculateBPM(tempo: Int): Double {
+            return 60_000_000.0 / (tempo * ticks)
         }
     }
 
@@ -56,6 +84,14 @@ abstract class Division {
         override fun write(byteWriter: ByteWriter) {
             byteWriter.addByte((framesPerSecond.toInt() and 0x7F).toByte())
             byteWriter.addByte(ticksPerFrame)
+        }
+
+        override fun getTickRate(): Int {
+            throw NotImplementedError("SMPTE is not supported")
+        }
+
+        override fun calculateBPM(tempo: Int): Double {
+            throw NotImplementedError("SMPTE is not supported")
         }
     }
 }

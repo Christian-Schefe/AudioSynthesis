@@ -3,20 +3,17 @@ package midi.raw
 import util.ByteConverter
 import util.ByteWriter
 
-open class RawMessage(val deltaTime: Int, size: Int) {
+open class RawMessage(val deltaTime: Int) {
     init {
         require(deltaTime >= 0) { "Delta time must be non-negative" }
-        println("Delta Time: $deltaTime, Size: ${size + ByteConverter.intToVarInt(deltaTime).size}")
     }
-
-    val totalSize = size + ByteConverter.intToVarInt(deltaTime).size
 
     open fun write(byteWriter: ByteWriter) {
         byteWriter.addVarInt(deltaTime)
     }
 }
 
-enum class ChannelMessageStatus(private val intValue: Int, val dataSize: Int) {
+enum class ChannelMessageStatus(val intValue: Int, val dataSize: Int) {
     NOTE_OFF(0x80, 2), NOTE_ON(0x90, 2), POLYPHONIC_AFTERTOUCH(0xA0, 2), CONTROL_CHANGE(0xB0, 2), PROGRAM_CHANGE(
         0xC0, 1
     ),
@@ -37,17 +34,31 @@ enum class ChannelMessageStatus(private val intValue: Int, val dataSize: Int) {
 }
 
 class RawChannelVoiceMessage(deltaTime: Int, val status: ChannelMessageStatus, val channel: Byte, val data: ByteArray) :
-    RawMessage(deltaTime, status.dataSize + 1) {
+    RawMessage(deltaTime) {
 
     init {
         require(data.size == status.dataSize) { "Data size must be ${status.dataSize}" }
         require(channel in 0..15) { "Channel must be in range 0..15" }
     }
 
+    override fun toString(): String {
+        return "RawChannelVoiceMessage(deltaTime=$deltaTime, status=$status, channel=$channel, data=${data.toList()})"
+    }
+
     override fun write(byteWriter: ByteWriter) {
         super.write(byteWriter)
         byteWriter.addByte(status.getByte(channel))
         byteWriter.addBytes(data)
+    }
+
+    fun writeRunningStatus(byteWriter: ByteWriter, runningStatus: Byte): Byte {
+        super.write(byteWriter)
+        val statusByte = status.getByte(channel)
+        if (runningStatus != statusByte) {
+            byteWriter.addByte(statusByte)
+        }
+        byteWriter.addBytes(data)
+        return statusByte
     }
 }
 
@@ -71,12 +82,15 @@ enum class SystemMessageStatus(intValue: Int, val dataSize: Int?) {
     }
 }
 
-class RawSystemMessage(deltaTime: Int, val status: SystemMessageStatus, val data: ByteArray) :
-    RawMessage(deltaTime, data.size + 1) {
+class RawSystemMessage(deltaTime: Int, val status: SystemMessageStatus, val data: ByteArray) : RawMessage(deltaTime) {
     init {
         if (status.dataSize != null) {
             require(data.size == status.dataSize) { "Data size must be ${status.dataSize}" }
         }
+    }
+
+    override fun toString(): String {
+        return "RawSystemMessage(deltaTime=$deltaTime, status=$status, data=${data.toList()})"
     }
 
     override fun write(byteWriter: ByteWriter) {
@@ -96,7 +110,7 @@ enum class MetaEventStatus(intValue: Int, val dataSize: Int?) {
     END_OF_TRACK(0x2F, 0), SET_TEMPO(0x51, 3), SMPTE_OFFSET(0x54, 5), TIME_SIGNATURE(0x58, 4), KEY_SIGNATURE(
         0x59, 2
     ),
-    SEQUENCER_SPECIFIC(0x7F, null);
+    SEQUENCER_SPECIFIC(0x7F, null), UNKNOWN(0xFF, null);
 
     val byte = intValue.toByte()
 
@@ -104,17 +118,20 @@ enum class MetaEventStatus(intValue: Int, val dataSize: Int?) {
         val codeMap = entries.associateBy(MetaEventStatus::byte)
 
         fun fromByte(byte: Byte): MetaEventStatus {
-            return codeMap[byte] ?: error("Invalid meta event status byte")
+            return codeMap[byte] ?: UNKNOWN
         }
     }
 }
 
-class RawMetaEvent(deltaTime: Int, val type: MetaEventStatus, val data: ByteArray) :
-    RawMessage(deltaTime, data.size + 2 + ByteConverter.intToVarInt(data.size).size) {
+class RawMetaEvent(deltaTime: Int, val type: MetaEventStatus, val data: ByteArray) : RawMessage(deltaTime) {
     init {
         if (type.dataSize != null) {
             require(data.size == type.dataSize) { "Data size must be ${type.dataSize}" }
         }
+    }
+
+    override fun toString(): String {
+        return "RawMetaEvent(deltaTime=$deltaTime, type=$type, data=${data.toList()})"
     }
 
     override fun write(byteWriter: ByteWriter) {
