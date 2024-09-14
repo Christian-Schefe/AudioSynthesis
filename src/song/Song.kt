@@ -6,6 +6,6 @@ class Song(val tracks: List<Track>, val tempoTrack: TempoTrack) {
     }
 
     fun duration(): Double {
-        return tracks.map { it.duration() }.maxOrNull() ?: 0.0
+        return tracks.map { it.duration(tempoTrack) }.maxOrNull() ?: 0.0
     }
 }

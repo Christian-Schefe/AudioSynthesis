@@ -75,19 +75,23 @@ class ByteReader(
         return byteArray
     }
 
-    fun readUntil(predicate: Byte, includeLast: Boolean): ByteArray {
+    fun readUntil(predicate: Byte, returnLast: Boolean): ByteArray {
         val readBytes = mutableListOf<Byte>()
         while (index < length) {
-            val byte = peekByte()
+            val byte = readByte()
             if (byte == predicate) {
-                if (includeLast) {
-                    readBytes.add(readByte())
+                if (returnLast) {
+                    readBytes.add(byte)
                 }
                 return readBytes.toByteArray()
             }
-            readBytes.add(readByte())
+            readBytes.add(byte)
         }
         throw NoSuchElementException("No byte matching the predicate found")
+    }
+
+    fun actualPosition(): Int {
+        return offset + index
     }
 
     fun subReader(length: Int): ByteReader {

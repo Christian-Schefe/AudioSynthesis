@@ -3,9 +3,10 @@ package midi.raw
 import java.io.File
 
 fun main() {
-    val inputFile = "test_data/Am_I_Blue_AB.mid"
+    val inputFile = "test_data/beethoven_romance.mid"
     val outputFile = "test_data/test_output.mid"
     val rawMidi = RawMidi.readFromFile(inputFile)
+    rawMidi.tracks[0].events.forEach { println(it) }
     rawMidi.writeToFile(outputFile)
     val midi2 = RawMidi.readFromFile(outputFile)
 

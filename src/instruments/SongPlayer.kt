@@ -4,8 +4,15 @@ import nodes.AudioNode
 import nodes.Context
 import song.Song
 
-class SongPlayer(val soundFactory: () -> AudioNode, val song: Song, val trackNumber: Int, voiceCount: Int) :
-    AudioNode(0, 2) {
+data class InstrumentSettings(val maxRelease: Double, val preRelease: Double)
+
+class SongPlayer(
+    val soundFactory: () -> AudioNode,
+    val song: Song,
+    val trackNumber: Int,
+    voiceCount: Int,
+    val instrumentSettings: InstrumentSettings
+) : AudioNode(0, 2) {
     init {
         require(voiceCount > 0) { "Voice count must be greater than 0" }
         val testVoice = soundFactory()
@@ -37,7 +44,7 @@ class SongPlayer(val soundFactory: () -> AudioNode, val song: Song, val trackNum
             val data = voiceData[i]
             if (data != null) {
                 val (freq, velocity, endTime) = data
-                if (beats < endTime) {
+                if (beats < endTime - instrumentSettings.preRelease) {
                     val voiceOutput = voice.process(ctx, doubleArrayOf(freq, 1.0, velocity))
                     output[0] += voiceOutput[0]
                     output[1] += voiceOutput[1]
@@ -50,7 +57,7 @@ class SongPlayer(val soundFactory: () -> AudioNode, val song: Song, val trackNum
                     }
                 }
 
-                if (beats >= endTime + 1) {
+                if (beats >= endTime + instrumentSettings.maxRelease) {
                     voiceData[i] = null
                 }
             }
@@ -109,7 +116,7 @@ class SongPlayer(val soundFactory: () -> AudioNode, val song: Song, val trackNum
     }
 
     override fun clone(): AudioNode {
-        return SongPlayer(soundFactory, song, trackNumber, voices.size)
+        return SongPlayer(soundFactory, song, trackNumber, voices.size, instrumentSettings)
     }
 
     override fun init(ctx: Context) {

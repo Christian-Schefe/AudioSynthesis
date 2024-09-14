@@ -16,20 +16,22 @@ fun flute(random: Random): AudioNode {
 }
 
 fun piano(random: Random): AudioNode {
-    val phase = random.nextDouble(0.0, 1.0)/*val sound = (OscillatorNode.square(initialPhase = phase) * 0.8) bus (OscillatorNode.sine(
-        initialPhase = phase
-    ) * 0.2)*/
+    val phase = random.nextDouble(0.0, 1.0)
     val sound = OscillatorNode.softSaw(initialPhase = phase)
-    val node = adsrVolume(sound, 0.02, 1.0, 0.1, 0.5)
-    return (node * CustomNode.pass(1)) pipe CustomNode.duplicate(1)
+    val adsrSound = sound * ADSRNode(0.02, 1.0, 0.1, 0.5)
+    val velocitySound = adsrSound * CustomNode.pass(1) * 2.0
+    return velocitySound pipe BiquadFilter.lowpass(2000.0, 1.0) pipe CustomNode.duplicate(1)
 }
 
 fun violin(random: Random): AudioNode {
     val phase = random.nextDouble(0.0, 1.0)
-    val sound = (OscillatorNode.softSquare(initialPhase = phase) * 0.7) bus (OscillatorNode.softSaw(
+    val sound = (OscillatorNode.softSquare(initialPhase = phase) * 0.3) bus (OscillatorNode.saw(
         initialPhase = phase
-    ) * 0.3)
+    ) * 0.7)
     val vibratoFreqMod = vibrato2(0.01, random)
-    val node = vibratoFreqMod stack CustomNode.pass(1) pipe adsrVolume(sound, 0.1, 1.5, 0.9, 0.5)
-    return (node * CustomNode.pass(1)) pipe CustomNode.duplicate(1)
+    val node = vibratoFreqMod stack CustomNode.pass(1) pipe adsrVolume(sound, 0.1, 1.5, 0.9, 0.2)
+    return (node * CustomNode.pass(1)) pipe Distortion.tanh(3.0) pipe BiquadFilter.lowpass(
+        2000.0,
+        1.0
+    ) pipe CustomNode.duplicate(1)
 }

@@ -12,7 +12,7 @@ class SongConverter {
         for (track in midi.events) {
             val notes = mutableListOf<Note>()
             val activeKeys = mutableMapOf<Int, Pair<Int, Double>>()
-            for ((time, event) in track) {
+            for ((time, event) in track.events) {
                 if (event is NoteOnEvent) {
                     if (activeKeys.containsKey(event.key) && event.velocity == 0.0) {
                         val (startTime, velocity) = activeKeys[event.key] ?: continue
@@ -31,7 +31,7 @@ class SongConverter {
                     activeKeys.remove(event.key)
                 }
             }
-            tracks.add(Track(notes))
+            tracks.add(Track(track.name, notes))
         }
         return Song(tracks, tempoTrack)
     }

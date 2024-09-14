@@ -97,6 +97,9 @@ class RawSystemMessage(deltaTime: Int, val status: SystemMessageStatus, val data
         super.write(byteWriter)
         byteWriter.addByte(status.byte)
         byteWriter.addBytes(data)
+        if (status == SystemMessageStatus.SYSTEM_EXCLUSIVE) {
+            byteWriter.addByte(SystemMessageStatus.END_OF_EXCLUSIVE.byte)
+        }
     }
 }
 

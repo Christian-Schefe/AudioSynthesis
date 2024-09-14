@@ -4,8 +4,10 @@ import midi.raw.*
 
 data class Timed<out T>(val time: Int, val value: T)
 
+class MidiTrack(val name: String, val events: List<Timed<MidiEvent>>)
+
 class Midi(
-    val tickRate: Int, val events: List<List<Timed<MidiEvent>>>, val tempoChanges: List<Timed<TempoChangeEvent>>
+    val tickRate: Int, val events: List<MidiTrack>, val tempoChanges: List<Timed<TempoChangeEvent>>
 ) {
     fun toRawMidi(): RawMidi {
         val division = Division.TicksPerQuarterNote(tickRate.toShort())
@@ -13,7 +15,7 @@ class Midi(
         val tracks = mutableListOf<RawTrackChunk>()
         for (i in events.indices) {
             val eventList = mutableListOf<Timed<MidiEvent>>()
-            eventList.addAll(events[i])
+            eventList.addAll(events[i].events)
             if (i == 0) {
                 eventList.addAll(tempoChanges)
             }
@@ -41,7 +43,7 @@ class Midi(
 
     companion object {
         fun fromRawMidi(file: RawMidi): Midi {
-            val tracks = mutableListOf<List<Timed<MidiEvent>>>()
+            val tracks = mutableListOf<MidiTrack>()
             val tempoChanges = mutableListOf<Timed<TempoChangeEvent>>()
 
             for (track in file.tracks) {
@@ -57,7 +59,7 @@ class Midi(
                         }
                     }
                 }
-                tracks.add(events)
+                tracks.add(MidiTrack("Track", events))
             }
 
             val tickRate = file.headerChunk.division.getTickRate()

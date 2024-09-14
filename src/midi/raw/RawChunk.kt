@@ -36,7 +36,10 @@ class RawTrackChunk(
         events.forEach {
             when (it) {
                 is RawChannelVoiceMessage -> runningStatusByte = it.writeRunningStatus(subWriter, runningStatusByte)
-                else -> it.write(subWriter)
+                else -> {
+                    runningStatusByte = 0
+                    it.write(subWriter)
+                }
             }
         }
         val data = subWriter.toByteArray()
