@@ -1,7 +1,7 @@
 package midi.raw
 
-import util.ByteWriter
-import util.Endianness
+import util.bytes.ByteWriter
+import util.bytes.Endianness
 import java.io.FileOutputStream
 
 class RawMidi(val headerChunk: RawHeaderChunk, val tracks: List<RawTrackChunk>) {

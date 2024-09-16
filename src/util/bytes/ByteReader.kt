@@ -1,4 +1,4 @@
-package util
+package util.bytes
 
 class ByteReader(
     private val endianness: Endianness, private val bytes: ByteArray, private val offset: Int, private val length: Int

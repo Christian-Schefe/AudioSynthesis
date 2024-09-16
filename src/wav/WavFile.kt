@@ -1,8 +1,8 @@
 package wav
 
-import util.OldByteWriter
-import util.OldByteReader
-import util.Endianness
+import util.bytes.OldByteWriter
+import util.bytes.OldByteReader
+import util.bytes.Endianness
 import java.io.FileOutputStream
 
 class WavFile(

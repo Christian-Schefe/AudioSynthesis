@@ -1,6 +1,6 @@
 package midi.raw
 
-import util.ByteWriter
+import util.bytes.ByteWriter
 
 open class RawChunk(
     private var type: RawChunkType

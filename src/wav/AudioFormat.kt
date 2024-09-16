@@ -1,7 +1,7 @@
 package wav
 
-import util.OldByteReader
-import util.OldByteWriter
+import util.bytes.OldByteReader
+import util.bytes.OldByteWriter
 
 enum class AudioFormat(
     val code: UShort,

@@ -1,7 +1,7 @@
 package midi.raw
 
-import util.ByteReader
-import util.Endianness
+import util.bytes.ByteReader
+import util.bytes.Endianness
 import java.io.FileInputStream
 
 class RawMidiReader {

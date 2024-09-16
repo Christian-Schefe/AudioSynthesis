@@ -1,7 +1,7 @@
 package wav
 
-import util.OldByteReader
-import util.Endianness
+import util.bytes.OldByteReader
+import util.bytes.Endianness
 import java.io.FileInputStream
 
 

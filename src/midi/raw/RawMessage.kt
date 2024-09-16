@@ -1,7 +1,6 @@
 package midi.raw
 
-import util.ByteConverter
-import util.ByteWriter
+import util.bytes.ByteWriter
 
 open class RawMessage(val deltaTime: Int) {
     init {

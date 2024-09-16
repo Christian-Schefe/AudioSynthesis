@@ -1,8 +1,8 @@
 package midi.abstraction
 
 import midi.raw.*
-import util.ByteConverter
-import util.Endianness
+import util.bytes.ByteConverter
+import util.bytes.Endianness
 
 abstract class MidiEvent {
     abstract fun toRawEvent(deltaTime: Int): RawMessage

@@ -1,4 +1,4 @@
-package util
+package util.bytes
 
 class OldByteWriter(private val endianness: Endianness) {
     private val bytes = mutableListOf<Byte>()

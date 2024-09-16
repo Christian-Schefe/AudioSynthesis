@@ -1,6 +1,6 @@
 package wav
 
-import util.OldByteWriter
+import util.bytes.OldByteWriter
 
 class WavFileData(val riffChunk: RiffChunk) {
     constructor(fmtChunk: FmtChunk, audioData: ByteArray, createFactChunk: Boolean = false) : this(
