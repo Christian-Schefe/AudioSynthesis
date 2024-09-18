@@ -1,31 +1,31 @@
 package wav
 
-import util.bytes.OldByteReader
-import util.bytes.OldByteWriter
+import util.bytes.ByteWriter
+import util.bytes.ByteReader
 
 enum class AudioFormat(
-    val code: UShort,
-    val bytesPerSample: UInt,
-    val writeSample: (Double, OldByteWriter) -> Unit,
-    val readSample: (OldByteReader) -> Double
+    val code: Short,
+    val bytesPerSample: Int,
+    val writeSample: (Double, ByteWriter) -> Unit,
+    val readSample: (ByteReader) -> Double
 ) {
-    PCM(1u,
-        2u,
+    PCM(1,
+        2,
         { sample, writer -> writer.addShort(toPcm(sample)) },
         { reader -> fromPcm(reader.readShort()) }),
-    IEEE_FLOAT(3u,
-        4u,
+    IEEE_FLOAT(3,
+        4,
         { sample, writer -> writer.addFloat(toIeeeFloat(sample)) },
-        { reader -> wav.fromIeeeFloat(reader.readFloat()) }),
-    A_LAW(6u, 1u, { sample, writer ->
+        { reader -> fromIeeeFloat(reader.readFloat()) }),
+    A_LAW(6, 1, { sample, writer ->
         writer.addByte(toALaw(sample))
     }, { reader -> fromALaw(reader.readByte()) }),
-    MU_LAW(7u, 1u, { sample, writer ->
+    MU_LAW(7, 1, { sample, writer ->
         writer.addByte(toMuLaw(sample))
     }, { reader -> fromMuLaw(reader.readByte()) });
 
     companion object {
-        fun fromCode(code: UShort): AudioFormat {
+        fun fromCode(code: Short): AudioFormat {
             return entries.find { it.code == code } ?: throw IllegalArgumentException("Unknown audio format")
         }
     }

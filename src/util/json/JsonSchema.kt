@@ -25,6 +25,10 @@ abstract class Result<out TOk, out TErr> {
     fun isErr(): Boolean = !isOk()
     fun ok(): TOk? = (this as? Ok)?.value
     fun err(): TErr? = (this as? Err)?.value
+    fun throwIfErr(): TOk {
+        if (this is Err) throw IllegalStateException("Result is an error: $value")
+        return (this as Ok).value
+    }
 }
 
 abstract class JsonSchema {
@@ -46,10 +50,13 @@ abstract class JsonSchema {
 
     internal abstract fun convertInternal(json: JsonElement): SchemaData
 
+    fun safeConvert(json: JsonElement): Result<SchemaData, ValidationError> {
+        val validation = validate(json)
+        return if (validation != null) Result.Err(validation) else Result.Ok(convert(json))
+    }
+
     fun safeParse(json: String): Result<SchemaData, ValidationError> {
-        val parsed = JsonParser(json).parse()
-        val validation = validate(parsed)
-        return if (validation != null) Result.Err(validation) else Result.Ok(convert(parsed))
+        return safeConvert(JsonParser(json).parse())
     }
 }
 
@@ -182,6 +189,7 @@ class ArraySchema(private val schema: JsonSchema) : JsonSchema() {
 
     data class ArrayData(val elements: List<SchemaData>) : SchemaData() {
         override operator fun get(index: Int): SchemaData = elements[index]
+        operator fun iterator(): Iterator<SchemaData> = elements.iterator()
     }
 }
 

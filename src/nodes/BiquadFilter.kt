@@ -1,6 +1,7 @@
 package nodes
 
 import kotlin.math.cos
+import kotlin.math.pow
 import kotlin.math.sin
 
 data class BiquadCoefficients(val b0: Double, val b1: Double, val b2: Double, val a1: Double, val a2: Double) {
@@ -42,15 +43,47 @@ data class BiquadCoefficients(val b0: Double, val b1: Double, val b2: Double, va
                 b0 = alpha * a0r, b1 = 0.0, b2 = -alpha * a0r, a1 = -2 * beta * a0r, a2 = (1 - alpha) * a0r
             )
         }
+
+        fun bell(sampleRate: Double, center: Double, q: Double, gain: Double): BiquadCoefficients {
+            val omega = 2 * Math.PI * center / sampleRate
+            val alpha = sin(omega) / (2 * q)
+            val a = 10.0.pow(gain / 40.0) // Gain factor in linear scale
+            val beta = cos(omega)
+
+            val a0 = 1 + alpha / a
+            val a1 = -2 * beta
+            val a2 = 1 - alpha / a
+
+            return BiquadCoefficients(
+                b0 = (1 + alpha * a) / a0, b1 = -2 * beta / a0, b2 = (1 - alpha * a) / a0, a1 = a1 / a0, a2 = a2 / a0
+            )
+        }
+
+        fun notch(sampleRate: Double, center: Double, q: Double): BiquadCoefficients {
+            val omega = 2 * Math.PI * center / sampleRate
+            val alpha = sin(omega) / (2 * q)
+            val beta = cos(omega)
+            val a0r = 1 / (1 + alpha)
+            return BiquadCoefficients(
+                b0 = a0r, b1 = -2 * beta * a0r, b2 = a0r, a1 = -2 * beta * a0r, a2 = (1 - alpha) * a0r
+            )
+        }
+    }
+
+    fun withGain(gainDB: Double): BiquadCoefficients {
+        val gain = 10.0.pow(gainDB / 20.0)
+        return BiquadCoefficients(
+            b0 = b0 * gain, b1 = b1 * gain, b2 = b2 * gain, a1 = a1, a2 = a2
+        )
     }
 }
 
 class BiquadFilter(val coefficientFactory: (Double) -> BiquadCoefficients) : AudioNode(1, 1) {
-    var x1 = 0.0
-    var x2 = 0.0
-    var y1 = 0.0
-    var y2 = 0.0
-    var coefficients = coefficientFactory(44100.0)
+    private var x1 = 0.0
+    private var x2 = 0.0
+    private var y1 = 0.0
+    private var y2 = 0.0
+    private var coefficients = coefficientFactory(44100.0)
 
     override fun process(ctx: Context, inputs: DoubleArray): DoubleArray {
         val x0 = inputs[0]
@@ -79,21 +112,33 @@ class BiquadFilter(val coefficientFactory: (Double) -> BiquadCoefficients) : Aud
     }
 
     companion object {
-        fun lowpass(cutoff: Double, q: Double): BiquadFilter {
+        fun lowpass(cutoff: Double, q: Double, gain: Double): BiquadFilter {
             return BiquadFilter { sampleRate ->
-                BiquadCoefficients.lowpass(sampleRate, cutoff, q)
+                BiquadCoefficients.lowpass(sampleRate, cutoff, q).withGain(gain)
             }
         }
 
-        fun highpass(cutoff: Double, q: Double): BiquadFilter {
+        fun highpass(cutoff: Double, q: Double, gain: Double): BiquadFilter {
             return BiquadFilter { sampleRate ->
-                BiquadCoefficients.highpass(sampleRate, cutoff, q)
+                BiquadCoefficients.highpass(sampleRate, cutoff, q).withGain(gain)
             }
         }
 
-        fun bandpass(center: Double, q: Double): BiquadFilter {
+        fun bandpass(center: Double, q: Double, gain: Double): BiquadFilter {
             return BiquadFilter { sampleRate ->
-                BiquadCoefficients.bandpass(sampleRate, center, q)
+                BiquadCoefficients.bandpass(sampleRate, center, q).withGain(gain)
+            }
+        }
+
+        fun bell(center: Double, q: Double, gain: Double): BiquadFilter {
+            return BiquadFilter { sampleRate ->
+                BiquadCoefficients.bell(sampleRate, center, q, gain)
+            }
+        }
+
+        fun notch(center: Double, q: Double, gain: Double): BiquadFilter {
+            return BiquadFilter { sampleRate ->
+                BiquadCoefficients.notch(sampleRate, center, q).withGain(gain)
             }
         }
     }

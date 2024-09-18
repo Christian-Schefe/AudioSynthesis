@@ -5,7 +5,7 @@ import kotlin.math.*
 
 class OscillatorNode(private val oscillator: (Double) -> Double, private val initialPhase: Double = 0.0) :
     AudioNode(1, 1) {
-    private var phase = initialPhase
+    private var phase = initialPhase % 1.0
 
     override fun process(ctx: Context, inputs: DoubleArray): DoubleArray {
         val freq = inputs[0]
@@ -64,7 +64,7 @@ class OscillatorNode(private val oscillator: (Double) -> Double, private val ini
         fun softSquare(freq: Double? = null, initialPhase: Double = 0.0): AudioNode {
             val func = { t: Double ->
                 val t2 = 4 * t + 1
-                2 * PI * atan(14 * cos(t2 * PI * 0.5))
+                0.66 * atan(14 * cos(t2 * PI * 0.5))
             }
             OscillatorNode(func, initialPhase).run {
                 return if (freq != null) (freq pipe this) else this

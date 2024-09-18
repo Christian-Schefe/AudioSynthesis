@@ -3,32 +3,35 @@ package instruments
 import nodes.AudioNode
 import nodes.Context
 import song.Song
+import kotlin.random.Random
 
 data class InstrumentSettings(val maxRelease: Double, val preRelease: Double)
 
 class SongPlayer(
-    val soundFactory: () -> AudioNode,
-    val song: Song,
-    val trackNumber: Int,
+    private val soundFactory: () -> AudioNode,
+    private val random: Random,
+    private val song: Song,
+    private val trackNumber: Int,
     voiceCount: Int,
-    val instrumentSettings: InstrumentSettings
+    private val instrumentSettings: InstrumentSettings
 ) : AudioNode(0, 2) {
     init {
         require(voiceCount > 0) { "Voice count must be greater than 0" }
         val testVoice = soundFactory()
         require(testVoice.outputCount == 2) { "Voice must have 2 outputs" }
-        require(testVoice.inputCount == 3) { "Voice must have 3 inputs" }
+        require(testVoice.inputCount == 4) { "Voice must have 3 inputs" }
     }
 
-    val voices = Array(voiceCount) { soundFactory() }
-    var freeVoicesSet = voices.indices.toMutableSet()
-    var freeVoicesQueue = ArrayDeque(freeVoicesSet)
-    val voiceData = Array<Triple<Double, Double, Double>?>(voiceCount) { null }
-    var trackPointer = 0
-    var tempoPointer = 0
+    private val voices = Array(voiceCount) { soundFactory() }
+    private var freeVoicesSet = voices.indices.toMutableSet()
+    private var freeVoicesQueue = ArrayDeque(freeVoicesSet)
+    private val voiceData = Array<DoubleArray?>(voiceCount) { null }
+    private var trackPointer = 0
+    private var tempoPointer = 0
 
-    var beats = 0.0
-    var bps = 2.0
+    private var beats = 0.0
+    private var time = 0.0
+    private var bps = 2.0
 
     override fun process(ctx: Context, inputs: DoubleArray): DoubleArray {
         checkNewNote()
@@ -37,19 +40,19 @@ class SongPlayer(
         return result
     }
 
-    fun processVoices(ctx: Context): DoubleArray {
+    private fun processVoices(ctx: Context): DoubleArray {
         val output = DoubleArray(2)
         for (i in voices.indices) {
             val voice = voices[i]
             val data = voiceData[i]
             if (data != null) {
-                val (freq, velocity, endTime) = data
+                val (freq, velocity, endTime, randVal) = data
                 if (beats < endTime - instrumentSettings.preRelease) {
-                    val voiceOutput = voice.process(ctx, doubleArrayOf(freq, 1.0, velocity))
+                    val voiceOutput = voice.process(ctx, doubleArrayOf(freq, 1.0, velocity, randVal))
                     output[0] += voiceOutput[0]
                     output[1] += voiceOutput[1]
                 } else {
-                    val voiceOutput = voice.process(ctx, doubleArrayOf(freq, 0.0, velocity))
+                    val voiceOutput = voice.process(ctx, doubleArrayOf(freq, 0.0, velocity, randVal))
                     output[0] += voiceOutput[0]
                     output[1] += voiceOutput[1]
                     if (freeVoicesSet.add(i)) {
@@ -57,7 +60,7 @@ class SongPlayer(
                     }
                 }
 
-                if (beats >= endTime + instrumentSettings.maxRelease) {
+                if (beats >= endTime - instrumentSettings.preRelease + instrumentSettings.maxRelease) {
                     voiceData[i] = null
                 }
             }
@@ -65,7 +68,7 @@ class SongPlayer(
         return output
     }
 
-    fun tick(ctx: Context) {
+    private fun tick(ctx: Context) {
         val tempoChanges = song.tempoTrack.tempoChanges
         if (tempoPointer < tempoChanges.size) {
             var tempoChange = tempoChanges[tempoPointer]
@@ -81,9 +84,10 @@ class SongPlayer(
 
         val delta = 1.0 / ctx.sampleRate
         beats += delta * bps
+        time += delta
     }
 
-    fun checkNewNote() {
+    private fun checkNewNote() {
         val track = song.tracks[trackNumber]
         if (trackPointer >= track.notes.size) {
             return
@@ -98,7 +102,10 @@ class SongPlayer(
             freeVoicesSet.remove(voice)
             voices[voice].reset()
 
-            voiceData[voice] = Triple(Instrument.midiNoteToFreq(note.key), note.velocity, note.time + note.duration)
+            val endBeat = note.time + note.duration
+            val endTime = song.tempoTrack.beatToTime(endBeat)
+            voiceData[voice] =
+                doubleArrayOf(Instrument.midiNoteToFreq(note.key), note.velocity, endBeat, random.nextDouble())
             trackPointer++
             if (trackPointer >= track.notes.size) {
                 break
@@ -116,7 +123,7 @@ class SongPlayer(
     }
 
     override fun clone(): AudioNode {
-        return SongPlayer(soundFactory, song, trackNumber, voices.size, instrumentSettings)
+        return SongPlayer(soundFactory, random, song, trackNumber, voices.size, instrumentSettings)
     }
 
     override fun init(ctx: Context) {

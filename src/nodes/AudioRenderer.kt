@@ -1,6 +1,8 @@
 package nodes
 
-class AudioRenderer(private val ctx: Context, private val audioNode: AudioNode, private val sampleRate: Int) {
+class AudioRenderer(private val ctx: Context, private val audioNode: AudioNode) {
+    private val sampleRate = ctx.sampleRate
+
     init {
         require(sampleRate > 0)
         require(audioNode.inputCount == 0)
@@ -33,6 +35,9 @@ class AudioRenderer(private val ctx: Context, private val audioNode: AudioNode, 
         audioNode.init(ctx)
 
         for (i in 0..<ticks) {
+            if (i % (sampleRate * 10) == 0) {
+                println("Rendering... ${i.toDouble() / ticks * 100}%")
+            }
             val inputs = DoubleArray(0)
             val nodeOutputs = audioNode.process(ctx, inputs)
             for (channelIndex in 0..<channels) {

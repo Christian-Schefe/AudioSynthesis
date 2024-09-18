@@ -11,11 +11,10 @@ fun vibrato(amount: Double): AudioNode {
     return CustomNode.pass(1) * mappedLFO
 }
 
-fun vibrato2(amount: Double, random: Random): AudioNode {
-    val freq = 5.0 + random.nextDouble(-1.0, 1.0)
+fun vibrato2(amount: Double, frequency: Double): AudioNode {
     val lfo = Envelope({ t ->
         val am = min(t, 1.0) * amount * 0.5
-        xerp(1.0 / (1.0 + am), 1.0 + am, sin(freq * t * 2 * PI))
+        xerp(1.0 / (1.0 + am), 1.0 + am, sin(frequency * t * 2 * PI))
     })
     return CustomNode.pass(1) * lfo
 }

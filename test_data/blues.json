@@ -1,0 +1,11 @@
+{
+  "midiFile": "test_data/blues.mid",
+  "tracks": [
+    {
+      "instrument": "violin",
+      "volume": 0.5,
+      "pan": 0.5,
+      "effects": []
+    }
+  ]
+}

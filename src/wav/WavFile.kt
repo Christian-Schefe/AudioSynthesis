@@ -1,12 +1,12 @@
 package wav
 
-import util.bytes.OldByteWriter
-import util.bytes.OldByteReader
+import util.bytes.ByteWriter
+import util.bytes.ByteReader
 import util.bytes.Endianness
 import java.io.FileOutputStream
 
 class WavFile(
-    private val audioFormat: AudioFormat, val samples: Array<DoubleArray>, private val sampleRate: UInt
+    private val audioFormat: AudioFormat, val samples: Array<DoubleArray>, private val sampleRate: Int
 ) {
     private val channelCount = samples.size
     private val channelSampleCount = samples[0].size
@@ -16,7 +16,7 @@ class WavFile(
     }
 
     private fun computeAudioData(): ByteArray {
-        val byteWriter = OldByteWriter(Endianness.LITTLE)
+        val byteWriter = ByteWriter(Endianness.LITTLE)
         for (i in 0..<channelSampleCount) {
             for (j in samples.indices) {
                 audioFormat.writeSample(samples[j][i].coerceIn(-1.0, 1.0), byteWriter)
@@ -28,13 +28,21 @@ class WavFile(
     private fun createFmtChunk(): FmtChunk {
         return FmtChunk(
             formatType = audioFormat,
-            numChannels = channelCount.toUShort(),
+            numChannels = channelCount.toShort(),
             sampleRate = sampleRate,
-            byteRate = sampleRate * channelCount.toUInt() * audioFormat.bytesPerSample.toUInt(),
-            blockAlign = (channelCount.toUInt() * audioFormat.bytesPerSample).toUShort(),
-            bitsPerSample = (8u * audioFormat.bytesPerSample).toUShort(),
-            fmtChunkExtension = FmtChunkExtension()
+            byteRate = sampleRate * channelCount * audioFormat.bytesPerSample,
+            blockAlign = (channelCount * audioFormat.bytesPerSample).toShort(),
+            bitsPerSample = (8 * audioFormat.bytesPerSample).toShort(),
+            fmtChunkExtension = createFmtChunkExtension()
         )
+    }
+
+    private fun createFmtChunkExtension(): FmtChunkExtension? {
+        return if (audioFormat == AudioFormat.PCM) {
+            null
+        } else {
+            FmtChunkExtension()
+        }
     }
 
     private fun buildWavFileData(): WavFileData {
@@ -47,14 +55,14 @@ class WavFile(
     fun withNormalizedSamples(factor: Double = 1.0): WavFile {
         val maxAmplitude = samples.mapNotNull { it.maxOrNull() }.maxOrNull() ?: 1.0
         return WavFile(
-            audioFormat,
-            samples.map { channel -> channel.map { (it / maxAmplitude) * factor }.toDoubleArray() }.toTypedArray(),
-            sampleRate
+            audioFormat, samples.map { channel ->
+                channel.map { ((it / maxAmplitude) * factor).coerceIn(-1.0, 1.0) }.toDoubleArray()
+            }.toTypedArray(), sampleRate
         )
     }
 
     fun writeToFile(filePath: String) {
-        val byteWriter = OldByteWriter(Endianness.LITTLE)
+        val byteWriter = ByteWriter(Endianness.LITTLE)
 
         buildWavFileData().write(byteWriter)
 
@@ -64,7 +72,9 @@ class WavFile(
     }
 
     companion object {
-        private fun parseSamples(audioFormat: AudioFormat, reader: OldByteReader, channelCount: Int): Array<DoubleArray> {
+        private fun parseSamples(
+            audioFormat: AudioFormat, reader: ByteReader, channelCount: Int
+        ): Array<DoubleArray> {
             val samples = Array(channelCount) { mutableListOf<Double>() }
             var i = 0
             while (reader.bytesLeft() > 0) {
@@ -77,7 +87,7 @@ class WavFile(
         private fun fromWavFileData(data: WavFileData): WavFile {
             val fmtChunk = data.riffChunk.getChunk(WavChunkType.FMT) as FmtChunk
             val dataChunk = data.riffChunk.getChunk(WavChunkType.DATA) as DataChunk
-            val reader = OldByteReader(Endianness.LITTLE, dataChunk.audioData)
+            val reader = ByteReader(Endianness.LITTLE, dataChunk.audioData)
             val channelCount = fmtChunk.numChannels.toInt()
             val samples = parseSamples(fmtChunk.formatType, reader, channelCount)
             return WavFile(fmtChunk.formatType, samples, fmtChunk.sampleRate)
