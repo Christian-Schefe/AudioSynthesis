@@ -60,7 +60,9 @@ class ConnectorNode(private val mode: Mode, private val leftNode: AudioNode, pri
             }
 
             if (mode == Mode.PIPE) {
-                require(leftNode.outputCount == rightNode.inputCount)
+                require(leftNode.outputCount == rightNode.inputCount) {
+                    "Left node output count ${leftNode.outputCount} must match right node input count ${rightNode.inputCount}"
+                }
             }
 
             return when (mode) {
@@ -70,7 +72,7 @@ class ConnectorNode(private val mode: Mode, private val leftNode: AudioNode, pri
         }
 
         private fun calcOutputs(mode: Mode, leftNode: AudioNode, rightNode: AudioNode): Int {
-            if (mode == Mode.STACK || mode == Mode.BUS_SPLIT) {
+            if (mode == Mode.STACK_ADD || mode == Mode.STACK_MULTIPLY || mode == Mode.BUS_ADD || mode == Mode.BUS_MULTIPLY) {
                 require(leftNode.outputCount == rightNode.outputCount)
             }
 

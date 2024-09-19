@@ -1,84 +1,13 @@
-import effects.Effect
-import effects.FourBandEqualizer
-import effects.NoEffect
+import effects.*
 import instruments.*
 import midi.abstraction.Midi
 import nodes.*
+import playback.WavFilePlayer
 import song.SongConverter
 import util.json.*
 import wav.*
 import java.io.FileInputStream
 import kotlin.time.measureTimedValue
-
-/*fun main() {
-    val sampleRate = 44100
-    val ctx = Context(0, sampleRate)
-    val midi = Midi.readFromFile("test_data/blues.mid")
-    val song = SongConverter().fromMidi(midi)
-
-    var node: AudioNode? = null
-
-    /*val factories = mapOf(
-        0 to (InstrumentSettings(1.0, 0.0) to { piano(ctx.random) }),
-        1 to (InstrumentSettings(1.0, 0.15) to { violin(ctx.random) }),
-        2 to (InstrumentSettings(1.0, 0.0) to { piano(ctx.random) }),
-        3 to (InstrumentSettings(1.0, 0.0) to { piano(ctx.random) }),
-    )*/
-
-    val factories = mutableMapOf<Int, Pair<InstrumentSettings, () -> AudioNode>>()
-    for (i in 0 until song.tracks.size) {
-        factories[i] = InstrumentSettings(1.0, 0.0) to { piano(ctx.random) }
-    }
-
-    var duration = 0.0
-
-    for ((track, data) in factories) {
-        val (settings, factory) = data
-        println("Track $track: ${song.tracks[track].name} with ${song.tracks[track].notes.size} notes")
-        val trackNode = SongPlayer(factory, song, track, 36, settings)
-        if (node == null) {
-            node = trackNode
-        } else {
-            node += trackNode
-        }
-        duration = maxOf(duration, song.tracks[track].duration(song.tempoTrack))
-        //println("notes: ${song.tracks[track].notes}")
-    }
-
-    if (node == null) {
-        println("No tracks found in song")
-        return
-    }
-
-    val renderer = AudioRenderer(ctx, node, sampleRate)
-
-    println("Rendering ${song.tracks.size} tracks with $duration seconds of audio...")
-
-    val (samples, timeTaken) = measureTimedValue {
-        renderer.renderStereo(duration + 5, 2)
-    }
-
-    println("Time taken: $timeTaken")
-
-    val wavFile = WavFile(
-        AudioFormat.IEEE_FLOAT, samples, sampleRate
-    ).withNormalizedSamples(1.0)
-
-    println("Writing output.wav...")
-    wavFile.writeToFile("output.wav")
-    println("Done!")
-
-    val readFile = WavFile.readFromFile("output.wav")
-    val readSamples = readFile.samples
-
-    for (i in 0..<readSamples.size) {
-        for (j in 0..<readSamples[i].size) {
-            if (readSamples[i][j] - wavFile.samples[i][j] > 0.0001) {
-                println("Sample $i $j: ${readSamples[i][j]} != ${wavFile.samples[i][j]}")
-            }
-        }
-    }
-}*/
 
 fun render(ctx: Context, node: AudioNode, duration: Double): WavFile {
     println("Rendering $duration seconds of audio...")
@@ -107,7 +36,7 @@ fun main() {
     val sampleRate = 44100
     val ctx = Context(0, sampleRate)
 
-    val json = FileInputStream("test_data/blues.json").readAllBytes().decodeToString()
+    val json = FileInputStream("test_data/castle.json").readAllBytes().decodeToString()
     val schema = ObjectSchema(
         "midiFile" to StringSchema() to false, "tracks" to ArraySchema(
             ObjectSchema(
@@ -159,8 +88,12 @@ fun main() {
         return
     }
 
-    val wavFile = render(ctx, masterNode, song.duration())
+    /*val wavFile = render(ctx, masterNode, song.duration() - 200)
     save(wavFile, "output.wav")
+
+    player.play(wavFile)*/
+    val player = WavFilePlayer(0.5)
+    player.renderAndPlay(masterNode, ctx, song.duration() + 5)
 }
 
 fun buildEffects(effects: List<SchemaData>): List<Effect> {
@@ -176,19 +109,32 @@ fun buildEffects(effects: List<SchemaData>): List<Effect> {
 }
 
 fun buildEffect(type: String, params: JsonElement): Effect {
-    if (type == "EQ") {
+    if (type == "Highpass") {
         val schema = ObjectSchema(
-            "low" to NumberSchema() to false,
-            "lowMid" to NumberSchema() to false,
-            "highMid" to NumberSchema() to false,
-            "high" to NumberSchema() to false
+            "cutoff" to NumberSchema() to false,
+            "mix" to NumberSchema() to true,
+            "q" to NumberSchema() to true,
+            "gain" to NumberSchema() to true
         )
         val parsed = schema.safeConvert(params).throwIfErr()
-        val low = parsed["low"]!!.num().value.toDouble()
-        val lowMid = parsed["lowMid"]!!.num().value.toDouble()
-        val highMid = parsed["highMid"]!!.num().value.toDouble()
-        val high = parsed["high"]!!.num().value.toDouble()
-        return FourBandEqualizer(low, lowMid, highMid, high)
+        val cutoff = parsed["cutoff"]!!.num().value.toDouble()
+        val mix = parsed["mix"]?.num()?.value?.toDouble() ?: 1.0
+        val q = parsed["q"]?.num()?.value?.toDouble() ?: 1.0
+        val gain = parsed["gain"]?.num()?.value?.toDouble() ?: 0.0
+        return HighpassFilter(cutoff, mix, q, gain)
+    } else if (type == "Lowpass") {
+        val schema = ObjectSchema(
+            "cutoff" to NumberSchema() to false,
+            "mix" to NumberSchema() to true,
+            "q" to NumberSchema() to true,
+            "gain" to NumberSchema() to true
+        )
+        val parsed = schema.safeConvert(params).throwIfErr()
+        val cutoff = parsed["cutoff"]!!.num().value.toDouble()
+        val mix = parsed["mix"]?.num()?.value?.toDouble() ?: 1.0
+        val q = parsed["q"]?.num()?.value?.toDouble() ?: 1.0
+        val gain = parsed["gain"]?.num()?.value?.toDouble() ?: 0.0
+        return LowpassFilter(cutoff, mix, q, gain)
     }
     return NoEffect()
 }

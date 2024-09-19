@@ -23,12 +23,10 @@
     },
     "effects": [
       {
-        "type": "EQ",
+        "type": "Lowpass",
         "params": {
-          "low": 10.0,
-          "lowMid": 10.0,
-          "highMid": -5.0,
-          "high": -10.0
+          "cutoff": 1000.0,
+          "mix": 1.0
         }
       }
     ]
@@ -38,9 +36,9 @@
     "synth": "simpleSynth",
     "params": {
       "vibrato": 0.01,
-      "detune": 0.001,
+      "detune": 0.0,
       "adsr": {
-        "attack": 0.1,
+        "attack": 0.05,
         "decay": 1.0,
         "sustain": 0.9,
         "release": 0.2
@@ -52,18 +50,23 @@
         },
         "soft square": {
           "amplitude": 0.3,
-          "phase": 0.0
+          "phase": 0.75
         }
       }
     },
     "effects": [
       {
-        "type": "EQ",
+        "type": "Lowpass",
         "params": {
-          "low": 0.0,
-          "lowMid": 0.0,
-          "highMid": 0.0,
-          "high": 0.0
+          "cutoff": 1000.0,
+          "mix": 1.0
+        }
+      },
+      {
+        "type": "Highpass",
+        "params": {
+          "cutoff": 200.0,
+          "mix": 1.0
         }
       }
     ]

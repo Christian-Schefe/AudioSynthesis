@@ -6,10 +6,10 @@ import util.bytes.Endianness
 import java.io.FileOutputStream
 
 class WavFile(
-    private val audioFormat: AudioFormat, val samples: Array<DoubleArray>, private val sampleRate: Int
+    private val audioFormat: AudioFormat, val samples: Array<DoubleArray>, val sampleRate: Int
 ) {
-    private val channelCount = samples.size
-    private val channelSampleCount = samples[0].size
+    val channelCount = samples.size
+    val channelSampleCount = samples[0].size
 
     init {
         require(samples.all { it.size == channelSampleCount }) { "All channels must have the same number of samples" }
