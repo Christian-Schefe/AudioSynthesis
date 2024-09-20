@@ -1,5 +1,7 @@
 package nodes
 
+import kotlin.math.roundToInt
+
 class AudioRenderer(private val ctx: Context, private val audioNode: AudioNode) {
     private val sampleRate = ctx.sampleRate
 
@@ -35,8 +37,8 @@ class AudioRenderer(private val ctx: Context, private val audioNode: AudioNode) 
         audioNode.init(ctx)
 
         for (i in 0..<ticks) {
-            if (i % (sampleRate * 10) == 0) {
-                println("Rendering... ${i.toDouble() / ticks * 100}%")
+            if (i % (ticks / 10) == 0) {
+                println("Rendering... ${(i.toDouble() / ticks * 100).roundToInt()}%")
             }
             val inputs = DoubleArray(0)
             val nodeOutputs = audioNode.process(ctx, inputs)

@@ -2,6 +2,7 @@ import nodes.*
 import playback.AudioPlayer
 import wav.*
 import java.io.FileInputStream
+import kotlin.concurrent.thread
 import kotlin.time.measureTimedValue
 
 
@@ -37,12 +38,16 @@ fun main() {
         return
     }
 
-    /*val wavFile = render(ctx, masterNode, song.duration() - 200)
-    save(wavFile, "output.wav")
+    val clone = masterNode.clone()
 
-    player.play(wavFile)*/
-    val player = AudioPlayer()
-    player.renderAndPlay(masterNode, ctx, song.duration() + 2)
+    val handle = thread {
+        val player = AudioPlayer()
+        player.renderAndPlay(clone, ctx, song.duration() + 2)
+    }
+
+    val wavFile = render(ctx, masterNode, song.duration() + 2)
+    save(wavFile, "output.wav")
+    handle.join()
 }
 
 fun render(ctx: Context, node: AudioNode, duration: Double): WavFile {
