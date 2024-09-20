@@ -1,0 +1,14 @@
+{
+  "midiFile": "midiData/Etude_Heroique.mid",
+  "tracks": [
+    {
+      "tracks": [
+        0
+      ],
+      "instrument": "piano",
+      "volume": 0.5,
+      "pan": 0.0,
+      "effects": []
+    }
+  ]
+}

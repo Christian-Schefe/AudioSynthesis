@@ -11,24 +11,26 @@ class SongConverter {
         val tracks = mutableListOf<Track>()
         for (track in midi.events) {
             val notes = mutableListOf<Note>()
-            val activeKeys = mutableMapOf<Int, Pair<Int, Double>>()
+            val activeKeys = mutableMapOf<Pair<Int, Int>, Pair<Int, Double>>()
             for ((time, event) in track.events) {
                 if (event is NoteOnEvent) {
-                    if (activeKeys.containsKey(event.key) && event.velocity == 0.0) {
-                        val (startTime, velocity) = activeKeys[event.key] ?: continue
+                    val channelKey = event.channel to event.key
+                    if (activeKeys.containsKey(channelKey) && event.velocity == 0.0) {
+                        val (startTime, velocity) = activeKeys[channelKey] ?: continue
                         val start = startTime.toDouble() / midi.tickRate
                         val duration = (time - startTime).toDouble() / midi.tickRate
-                        notes.add(Note(event.key, start, duration, velocity))
-                        activeKeys.remove(event.key)
+                        notes.add(Note(event.channel, event.key, start, duration, velocity))
+                        activeKeys.remove(channelKey)
                     } else if (event.velocity > 0.0) {
-                        activeKeys[event.key] = time to event.velocity
+                        activeKeys[channelKey] = time to event.velocity
                     }
                 } else if (event is midi.abstraction.NoteOffEvent) {
-                    val (startTime, velocity) = activeKeys[event.key] ?: continue
+                    val channelKey = event.channel to event.key
+                    val (startTime, velocity) = activeKeys[channelKey] ?: continue
                     val start = startTime.toDouble() / midi.tickRate
                     val duration = (time - startTime).toDouble() / midi.tickRate
-                    notes.add(Note(event.key, start, duration, velocity))
-                    activeKeys.remove(event.key)
+                    notes.add(Note(event.channel, event.key, start, duration, velocity))
+                    activeKeys.remove(channelKey)
                 }
             }
             tracks.add(Track(track.name, notes))

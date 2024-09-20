@@ -1,0 +1,41 @@
+{
+  "midiFile": "midiData/castle.mid",
+  "tracks": [
+    {
+      "tracks": [
+        0
+      ],
+      "instrument": "piano",
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "tracks": [
+        1
+      ],
+      "instrument": "piano",
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "tracks": [
+        2
+      ],
+      "instrument": "violin",
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "tracks": [
+        3
+      ],
+      "instrument": "flute",
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    }
+  ]
+}

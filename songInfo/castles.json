@@ -1,0 +1,32 @@
+{
+  "midiFile": "midiData/castles.mid",
+  "tracks": [
+    {
+      "tracks": [
+        1
+      ],
+      "instrument": "guitar",
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "tracks": [
+        2
+      ],
+      "instrument": "guitar",
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "tracks": [
+        3
+      ],
+      "instrument": "flute",
+      "volume": 0.5,
+      "pan": 0.0,
+      "effects": []
+    }
+  ]
+}

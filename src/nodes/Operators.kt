@@ -82,3 +82,11 @@ operator fun AudioNode.times(factor: Double): AudioNode {
 operator fun Double.times(other: AudioNode): AudioNode {
     return ConstantNode(this) * other
 }
+
+infix fun AudioNode.gain(gain: Double): AudioNode {
+    return this pipe CustomNode(this.outputCount, this.outputCount) { input ->
+        input.map {
+            it * gain
+        }.toDoubleArray()
+    }
+}

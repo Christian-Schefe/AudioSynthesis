@@ -69,13 +69,6 @@ data class BiquadCoefficients(val b0: Double, val b1: Double, val b2: Double, va
             )
         }
     }
-
-    fun withGain(gainDB: Double): BiquadCoefficients {
-        val gain = 10.0.pow(gainDB / 20.0)
-        return BiquadCoefficients(
-            b0 = b0 * gain, b1 = b1 * gain, b2 = b2 * gain, a1 = a1, a2 = a2
-        )
-    }
 }
 
 class BiquadFilter(val coefficientFactory: (Double) -> BiquadCoefficients) : AudioNode(1, 1) {
@@ -112,21 +105,21 @@ class BiquadFilter(val coefficientFactory: (Double) -> BiquadCoefficients) : Aud
     }
 
     companion object {
-        fun lowpass(cutoff: Double, q: Double, gain: Double): BiquadFilter {
+        fun lowpass(cutoff: Double, q: Double): BiquadFilter {
             return BiquadFilter { sampleRate ->
-                BiquadCoefficients.lowpass(sampleRate, cutoff, q).withGain(gain)
+                BiquadCoefficients.lowpass(sampleRate, cutoff, q)
             }
         }
 
-        fun highpass(cutoff: Double, q: Double, gain: Double): BiquadFilter {
+        fun highpass(cutoff: Double, q: Double): BiquadFilter {
             return BiquadFilter { sampleRate ->
-                BiquadCoefficients.highpass(sampleRate, cutoff, q).withGain(gain)
+                BiquadCoefficients.highpass(sampleRate, cutoff, q)
             }
         }
 
-        fun bandpass(center: Double, q: Double, gain: Double): BiquadFilter {
+        fun bandpass(center: Double, q: Double): BiquadFilter {
             return BiquadFilter { sampleRate ->
-                BiquadCoefficients.bandpass(sampleRate, center, q).withGain(gain)
+                BiquadCoefficients.bandpass(sampleRate, center, q)
             }
         }
 
@@ -136,9 +129,9 @@ class BiquadFilter(val coefficientFactory: (Double) -> BiquadCoefficients) : Aud
             }
         }
 
-        fun notch(center: Double, q: Double, gain: Double): BiquadFilter {
+        fun notch(center: Double, q: Double): BiquadFilter {
             return BiquadFilter { sampleRate ->
-                BiquadCoefficients.notch(sampleRate, center, q).withGain(gain)
+                BiquadCoefficients.notch(sampleRate, center, q)
             }
         }
     }

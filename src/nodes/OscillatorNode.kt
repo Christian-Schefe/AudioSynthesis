@@ -46,14 +46,14 @@ class OscillatorNode(private val oscillator: (Double) -> Double, private val ini
         }
 
         fun saw(freq: Double? = null, initialPhase: Double = 0.0): AudioNode {
-            OscillatorNode({ 2 * it - 1 }, initialPhase).run {
+            OscillatorNode({ 1 - 2 * it }, initialPhase).run {
                 return if (freq != null) (freq pipe this) else this
             }
         }
 
         fun softSaw(freq: Double? = null, initialPhase: Double = 0.0): AudioNode {
             val func = { t: Double ->
-                val t2 = 2 * t - 1
+                val t2 = 1 - (2 * t)
                 t2 * (1 - t2.pow(12.0))
             }
             OscillatorNode(func, initialPhase).run {
@@ -63,7 +63,7 @@ class OscillatorNode(private val oscillator: (Double) -> Double, private val ini
 
         fun softSquare(freq: Double? = null, initialPhase: Double = 0.0): AudioNode {
             val func = { t: Double ->
-                val t2 = 4 * t + 1
+                val t2 = 4 * t - 1
                 0.66 * atan(14 * cos(t2 * PI * 0.5))
             }
             OscillatorNode(func, initialPhase).run {

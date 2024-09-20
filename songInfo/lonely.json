@@ -1,0 +1,75 @@
+{
+  "midiFile": "midiData/lonely.mid",
+  "tracks": [
+    {
+      "tracks": [
+        0
+      ],
+      "channels": [
+        4
+      ],
+      "instrument": "guitar",
+      "volume": 0.1,
+      "pan": -0.5,
+      "effects": []
+    },
+    {
+      "tracks": [
+        0
+      ],
+      "channels": [
+        2,
+        3
+      ],
+      "instrument": "guitar",
+      "volume": 0.1,
+      "pan": 0.5,
+      "effects": []
+    },
+    {
+      "tracks": [
+        0
+      ],
+      "channels": [
+        0
+      ],
+      "instrument": "flute",
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "tracks": [
+        0
+      ],
+      "channels": [
+        9
+      ],
+      "notes": [
+        35,
+        36
+      ],
+      "instrument": "bassdrum",
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "tracks": [
+        0
+      ],
+      "channels": [
+        9
+      ],
+      "notes": [
+        42,
+        44,
+        46
+      ],
+      "instrument": "hi-hat",
+      "volume": 0.1,
+      "pan": 0.0,
+      "effects": []
+    }
+  ]
+}
