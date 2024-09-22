@@ -1,5 +1,5 @@
 {
-  "midiFile": "midiData/castle.mid",
+  "midiFile": "data/midi/castle.mid",
   "tracks": [
     {
       "tracks": [

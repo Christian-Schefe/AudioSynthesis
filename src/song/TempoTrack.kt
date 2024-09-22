@@ -28,6 +28,12 @@ class TempoTrack(tempoChanges: List<TempoChange>) {
         val lastTempoChangeMoment = tempoChangeMoments[tempoChange] ?: 0.0
         return lastTempoChangeMoment + (beat - tempoChange.beat) * (60.0 / tempoChange.bpm)
     }
+
+    fun timeToBeat(time: Double): Double {
+        val tempoChange = tempoChanges.lastOrNull { tempoChangeMoments[it]!! <= time } ?: TempoChange(0.0, 120.0)
+        val lastTempoChangeMoment = tempoChangeMoments[tempoChange] ?: 0.0
+        return tempoChange.beat + (time - lastTempoChangeMoment) * (tempoChange.bpm / 60.0)
+    }
 }
 
 data class TempoChange(val beat: Double, val bpm: Double) {

@@ -3,15 +3,18 @@ package nodes
 import kotlin.math.*
 
 
-class OscillatorNode(private val oscillator: (Double) -> Double, private val initialPhase: Double = 0.0) :
-    AudioNode(1, 1) {
+class OscillatorNode(
+    private val oscillator: (Double) -> Double,
+    private val amplitude: Double = 1.0,
+    private val initialPhase: Double = 0.0
+) : AudioNode(1, 1) {
     private var phase = initialPhase % 1.0
 
     override fun process(ctx: Context, inputs: DoubleArray): DoubleArray {
         val freq = inputs[0]
         phase += ctx.timeStep * freq
         while (phase >= 1.0) phase -= 1.0
-        return doubleArrayOf(oscillator(phase))
+        return doubleArrayOf(oscillator(phase) * amplitude)
     }
 
     override fun reset() {
@@ -25,50 +28,38 @@ class OscillatorNode(private val oscillator: (Double) -> Double, private val ini
     }
 
     companion object {
-        fun sine(freq: Double? = null, initialPhase: Double = 0.0): AudioNode {
-            OscillatorNode({ sin(2 * PI * it) }, initialPhase).run {
-                return if (freq != null) (freq pipe this) else this
-            }
+        fun sine(amplitude: Double = 1.0, initialPhase: Double = 0.0): AudioNode {
+            return OscillatorNode({ sin(2 * PI * it) }, amplitude, initialPhase)
         }
 
-        fun square(freq: Double? = null, initialPhase: Double = 0.0): AudioNode {
-            OscillatorNode({ if (it < 0.5) 1.0 else -1.0 }, initialPhase).run {
-                return if (freq != null) (freq pipe this) else this
-            }
+        fun square(amplitude: Double = 1.0, initialPhase: Double = 0.0): AudioNode {
+            return OscillatorNode({ if (it < 0.5) 1.0 else -1.0 }, amplitude, initialPhase)
         }
 
-        fun triangle(freq: Double? = null, initialPhase: Double = 0.0): AudioNode {
-            OscillatorNode(
-                { if (it < 0.25) 4 * it else if (it < 0.75) 2 - 4 * it else -4 + 4 * it }, initialPhase
-            ).run {
-                return if (freq != null) (freq pipe this) else this
-            }
+        fun triangle(amplitude: Double = 1.0, initialPhase: Double = 0.0): AudioNode {
+            return OscillatorNode(
+                { if (it < 0.25) 4 * it else if (it < 0.75) 2 - 4 * it else -4 + 4 * it }, amplitude, initialPhase
+            )
         }
 
-        fun saw(freq: Double? = null, initialPhase: Double = 0.0): AudioNode {
-            OscillatorNode({ 1 - 2 * it }, initialPhase).run {
-                return if (freq != null) (freq pipe this) else this
-            }
+        fun saw(amplitude: Double = 1.0, initialPhase: Double = 0.0): AudioNode {
+            return OscillatorNode({ 1 - 2 * it }, amplitude, initialPhase)
         }
 
-        fun softSaw(freq: Double? = null, initialPhase: Double = 0.0): AudioNode {
+        fun softSaw(amplitude: Double = 1.0, initialPhase: Double = 0.0): AudioNode {
             val func = { t: Double ->
                 val t2 = 1 - (2 * t)
                 t2 * (1 - t2.pow(12.0))
             }
-            OscillatorNode(func, initialPhase).run {
-                return if (freq != null) (freq pipe this) else this
-            }
+            return OscillatorNode(func, amplitude, initialPhase)
         }
 
-        fun softSquare(freq: Double? = null, initialPhase: Double = 0.0): AudioNode {
+        fun softSquare(amplitude: Double = 1.0, initialPhase: Double = 0.0): AudioNode {
             val func = { t: Double ->
                 val t2 = 4 * t - 1
                 0.66 * atan(14 * cos(t2 * PI * 0.5))
             }
-            OscillatorNode(func, initialPhase).run {
-                return if (freq != null) (freq pipe this) else this
-            }
+            return OscillatorNode(func, amplitude, initialPhase)
         }
     }
 }

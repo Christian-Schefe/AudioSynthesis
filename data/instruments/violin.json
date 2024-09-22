@@ -1,0 +1,76 @@
+{
+  "name": "violin",
+  "synth": "simpleSynth",
+  "params": {
+    "vibrato": 0.008,
+    "waves": [
+      {
+        "type": "soft saw",
+        "amplitude": 0.6,
+        "phase": 0.0,
+        "envelopes": [
+          {
+            "type": "adsr",
+            "params": {
+              "attack": 0.05,
+              "decay": 1.0,
+              "sustain": 0.9,
+              "release": 0.2
+            }
+          }
+        ]
+      },
+      {
+        "type": "saw",
+        "amplitude": 0.1,
+        "phase": 0.0,
+        "freqFactor": 2.0,
+        "envelopes": [
+          {
+            "type": "adsr",
+            "params": {
+              "attack": 0.2,
+              "decay": 1.0,
+              "sustain": 0.5,
+              "release": 0.1
+            }
+          }
+        ]
+      },
+      {
+        "type": "soft square",
+        "amplitude": 0.3,
+        "phase": 0.75,
+        "envelopes": [
+          {
+            "type": "adsr",
+            "params": {
+              "attack": 0.05,
+              "decay": 1.0,
+              "sustain": 0.9,
+              "release": 0.2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "effects": [
+    {
+      "type": "lowpass",
+      "params": {
+        "cutoff": 4000.0,
+        "mix": 1.0,
+        "q": 0.7
+      }
+    },
+    {
+      "type": "highpass",
+      "params": {
+        "cutoff": 100.0,
+        "mix": 1.0,
+        "q": 0.7
+      }
+    }
+  ]
+}

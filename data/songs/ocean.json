@@ -1,0 +1,41 @@
+{
+  "midiFile": "data/midi/Dream Of The Ocean.mid",
+  "tracks": [
+    {
+      "tracks": [
+        0
+      ],
+      "instrument": "violin",
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "tracks": [
+        1
+      ],
+      "instrument": "guitar",
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "tracks": [
+        2
+      ],
+      "instrument": "piano",
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "tracks": [
+        3
+      ],
+      "instrument": "piano",
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    }
+  ]
+}

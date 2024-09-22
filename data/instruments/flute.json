@@ -1,0 +1,60 @@
+{
+  "name": "flute",
+  "synth": "simpleSynth",
+  "params": {
+    "vibrato": 0.01,
+    "waves": [
+      {
+        "type": "triangle",
+        "amplitude": 0.7,
+        "phase": 0.0,
+        "envelopes": [
+          {
+            "type": "adsr",
+            "params": {
+              "attack": 0.05,
+              "decay": 1.0,
+              "sustain": 0.9,
+              "release": 0.2
+            }
+          }
+        ]
+      },
+      {
+        "type": "sine",
+        "amplitude": 0.3,
+        "phase": 0.0,
+        "envelopes": [
+          {
+            "type": "adsr",
+            "params": {
+              "attack": 0.05,
+              "decay": 1.0,
+              "sustain": 0.9,
+              "release": 0.2
+            }
+          }
+        ]
+      },
+      {
+        "type": "sine",
+        "amplitude": 0.2,
+        "phase": 0.0,
+        "freqFactor": 2.0,
+        "envelopes": [
+          {
+            "type": "adsr",
+            "params": {
+              "attack": 0.05,
+              "decay": 1.0,
+              "sustain": 0.8,
+              "release": 0.1
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "effects": [
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "name": "snare",
+  "synth": "simpleSynth",
+  "params": {
+    "vibrato": 0.0,
+    "waves": [
+      {
+        "type": "soft square",
+        "amplitude": 0.2,
+        "freqFactor": 0.0,
+        "freqOffset": 200.0,
+        "envelopes": [
+          {
+            "type": "polynomial",
+            "params": {
+              "fadeTime": 0.03,
+              "power": 0.1
+            }
+          }
+        ]
+      },
+      {
+        "type": "sine",
+        "amplitude": 0.2,
+        "freqFactor": 0.0,
+        "freqOffset": 200.0,
+        "envelopes": [
+          {
+            "type": "polynomial",
+            "params": {
+              "fadeTime": 0.1,
+              "power": 0.3
+            }
+          }
+        ]
+      },
+      {
+        "type": "noise",
+        "amplitude": 0.6,
+        "freqFactor": 0.0,
+        "freqOffset": 200.0,
+        "envelopes": [
+          {
+            "type": "polynomial",
+            "params": {
+              "fadeTime": 0.1,
+              "power": 0.3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "effects": [
+    {
+      "type": "lowpass",
+      "params": {
+        "cutoff": 1000.0,
+        "mix": 1.0
+      }
+    },
+    {
+      "type": "gain",
+      "params": {
+        "gain": 2.0
+      }
+    }
+  ]
+}

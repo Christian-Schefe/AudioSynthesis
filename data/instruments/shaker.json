@@ -1,0 +1,52 @@
+{
+  "name": "shaker",
+  "synth": "simpleSynth",
+  "params": {
+    "vibrato": 0.0,
+    "waves": [
+      {
+        "type": "noise",
+        "amplitude": 1.0,
+        "freqFactor": 0.0,
+        "freqOffset": 1000.0,
+        "envelopes": [
+          {
+            "type": "polynomial",
+            "params": {
+              "fadeTime": 0.05,
+              "power": 0.1
+            }
+          },
+          {
+            "type": "fadeIn",
+            "params": {
+              "fadeTime": 0.01
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "effects": [
+    {
+      "type": "lowpass",
+      "params": {
+        "cutoff": 6000.0,
+        "mix": 0.6
+      }
+    },
+    {
+      "type": "distortion",
+      "params": {
+        "hardness": 2.0,
+        "mix": 0.2
+      }
+    },
+    {
+      "type": "gain",
+      "params": {
+        "gain": 0.6
+      }
+    }
+  ]
+}

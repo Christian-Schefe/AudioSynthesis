@@ -1,0 +1,68 @@
+{
+  "name": "piano",
+  "synth": "simpleSynth",
+  "params": {
+    "vibrato": 0.0,
+    "waves": [
+      {
+        "type": "sine",
+        "amplitude": 0.7,
+        "phase": 0.0,
+        "envelopes": [
+          {
+            "type": "adsr",
+            "params": {
+              "attack": 0.02,
+              "decay": 1.0,
+              "sustain": 0.1,
+              "release": 0.5
+            }
+          }
+        ]
+      },
+      {
+        "type": "sine",
+        "amplitude": 0.2,
+        "phase": 0.0,
+        "freqFactor": 2.0,
+        "envelopes": [
+          {
+            "type": "adsr",
+            "params": {
+              "attack": 0.02,
+              "decay": 0.8,
+              "sustain": 0.1,
+              "release": 0.3
+            }
+          }
+        ]
+      },
+      {
+        "type": "soft saw",
+        "amplitude": 0.3,
+        "phase": 0.5,
+        "envelopes": [
+          {
+            "type": "adsr",
+            "params": {
+              "attack": 0.02,
+              "decay": 1.0,
+              "sustain": 0.1,
+              "release": 0.5
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "effects": [
+    {
+      "type": "lowpass",
+      "params": {
+        "cutoff": 2000.0,
+        "mix": 0.7,
+        "q": 1.0
+      }
+    }
+  ]
+}

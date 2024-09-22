@@ -61,6 +61,7 @@ class AudioPlayer {
         }
 
         Thread.sleep((seconds * 1000).toLong())
+
         line.drain()
         line.stop()
     }

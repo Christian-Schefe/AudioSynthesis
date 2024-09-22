@@ -14,4 +14,11 @@ class Context(val seed: Int, val sampleRate: Int) {
         time += timeStep
         sampleCount += sampleRate
     }
+
+    fun clone(): Context {
+        return Context(seed, sampleRate).also {
+            it.time = time
+            it.sampleCount = sampleCount
+        }
+    }
 }

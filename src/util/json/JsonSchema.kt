@@ -85,11 +85,13 @@ class ObjectSchema(private val properties: Map<String, Pair<JsonSchema, Boolean>
     })
 
     override fun validateInternal(path: MutableList<String>, json: JsonElement): ValidationError? {
-        if (json !is JsonObject) return ValidationError(path.toTypedArray(), "Expected object")
+        if (json !is JsonObject) return ValidationError(
+            path.toTypedArray(), "Expected object, found ${json::class.simpleName}"
+        )
         val unusedKeys = json.keys.toMutableSet()
         for ((key, value) in properties) {
             if (!json.containsKey(key)) {
-                if (!value.second) return ValidationError(path.toTypedArray(), "Missing required key")
+                if (!value.second) return ValidationError(path.toTypedArray(), "Missing required key $key")
             } else {
                 path.add(key)
                 val err = value.first.validateInternal(path, json[key]!!)
@@ -98,7 +100,7 @@ class ObjectSchema(private val properties: Map<String, Pair<JsonSchema, Boolean>
                 unusedKeys.remove(key)
             }
         }
-        if (unusedKeys.isNotEmpty()) return ValidationError(path.toTypedArray(), "Unexpected keys")
+        if (unusedKeys.isNotEmpty()) return ValidationError(path.toTypedArray(), "Unexpected keys: $unusedKeys")
         return null
     }
 

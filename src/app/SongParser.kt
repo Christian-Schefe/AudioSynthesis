@@ -1,3 +1,5 @@
+package app
+
 import instruments.NoteFilter
 import midi.abstraction.Midi
 import song.Song

@@ -1,0 +1,50 @@
+{
+  "name": "guitar",
+  "synth": "simpleSynth",
+  "params": {
+    "vibrato": 0.0,
+    "waves": [
+      {
+        "type": "soft saw",
+        "amplitude": 0.5,
+        "phase": 0.5,
+        "envelopes": [
+          {
+            "type": "adsr",
+            "params": {
+              "attack": 0.01,
+              "decay": 1.5,
+              "sustain": 0.0,
+              "release": 1.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "sine",
+        "amplitude": 0.5,
+        "phase": 0.0,
+        "envelopes": [
+          {
+            "type": "adsr",
+            "params": {
+              "attack": 0.01,
+              "decay": 1.5,
+              "sustain": 0.0,
+              "release": 1.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "effects": [
+    {
+      "type": "distortion",
+      "params": {
+        "hardness": 2.0,
+        "mix": 1.0
+      }
+    }
+  ]
+}

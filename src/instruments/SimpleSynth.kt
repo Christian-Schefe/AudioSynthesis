@@ -9,91 +9,128 @@ interface Synth {
     fun buildAudio(song: Song, noteFilter: NoteFilter, random: Random): AudioNode
 }
 
-data class ADSR(val attack: Double, val decay: Double, val sustain: Double, val release: Double)
 enum class WaveType(val id: String) {
     SINE("sine"), SQUARE("square"), SAWTOOTH("saw"), TRIANGLE("triangle"), SOFT_SQUARE("soft square"), SOFT_SAWTOOTH("soft saw"), NOISE(
         "noise"
     )
 }
 
-data class WaveData(val amplitude: Double, val phase: Double)
+data class WaveData(
+    val type: WaveType,
+    val amplitude: Double,
+    val phase: Double,
+    val freqFactor: Double,
+    val freqOffset: Double,
+    val envelopes: List<EnvelopeNode>
+)
 
 class SimpleSynth(
-    private val vibrato: Double,
-    private val adsr: ADSR,
-    private val detune: Double,
-    private val freqOverride: Double?,
-    private val mix: Map<WaveType, WaveData>
+    private val vibrato: Double, private val mix: List<WaveData>
 ) : Synth {
     override fun buildNode(random: Random): AudioNode {
         val vibratoFreq = random.nextDouble(4.0, 5.0)
         val phaseOffset = random.nextDouble(0.0, 1.0)
-        return SynthNode(vibratoFreq, phaseOffset, vibrato, detune, freqOverride, adsr, mix)
+        return SynthNode(vibratoFreq, phaseOffset, vibrato, mix)
     }
 
     override fun buildAudio(song: Song, noteFilter: NoteFilter, random: Random): AudioNode {
         val factory = { buildNode(random) }
-        val instrumentPlayer =
-            InstrumentPlayer(factory, random, song, noteFilter, 36, InstrumentSettings(adsr.release, 0.0))
+        val releaseTimeEvaluator = ReleaseTimeEvaluator { releaseMoment ->
+            mix.maxOfOrNull {
+                it.envelopes.maxOfOrNull { env ->
+                    env.timeToSilence(releaseMoment)
+                } ?: 0.0
+            } ?: 0.0
+        }
+        val instrumentPlayer = InstrumentPlayer(factory, random, song, noteFilter, 36, releaseTimeEvaluator)
         return instrumentPlayer
+    }
+
+    class WaveNode(private val phaseOffset: Double, private val data: WaveData) : AudioNode(3, 2) {
+
+        private val envelopeNodes = data.envelopes.map { it.clone() }
+
+        private val oscillatorNode = when (data.type) {
+            WaveType.SINE -> OscillatorNode.sine(data.amplitude, phaseOffset + data.phase)
+            WaveType.SQUARE -> OscillatorNode.square(data.amplitude, phaseOffset + data.phase)
+            WaveType.SAWTOOTH -> OscillatorNode.saw(data.amplitude, phaseOffset + data.phase)
+            WaveType.TRIANGLE -> OscillatorNode.triangle(data.amplitude, phaseOffset + data.phase)
+            WaveType.SOFT_SQUARE -> OscillatorNode.softSquare(data.amplitude, phaseOffset + data.phase)
+            WaveType.SOFT_SAWTOOTH -> OscillatorNode.softSaw(data.amplitude, phaseOffset + data.phase)
+            WaveType.NOISE -> CustomNode.sink(1) stack NoiseNode()
+        }
+
+        override fun process(ctx: Context, inputs: DoubleArray): DoubleArray {
+            val freq = inputs[0] * data.freqFactor + data.freqOffset
+            val noteOn = inputs[1]
+            val velocity = inputs[2]
+
+            val envelopeValues = envelopeNodes.map { it.process(ctx, doubleArrayOf(noteOn))[0] }
+            val volume = envelopeValues.fold(1.0) { acc, value -> acc * value } * velocity
+            val output = oscillatorNode.process(ctx, doubleArrayOf(freq))[0] * volume
+            return doubleArrayOf(output, output)
+        }
+
+        override fun clone(): AudioNode {
+            return WaveNode(phaseOffset, data)
+        }
+
+        override fun reset() {
+            oscillatorNode.reset()
+            for (envelope in envelopeNodes) {
+                envelope.reset()
+            }
+        }
+
+        override fun init(ctx: Context) {
+            oscillatorNode.init(ctx)
+            for (envelope in envelopeNodes) {
+                envelope.init(ctx)
+            }
+        }
     }
 
     class SynthNode(
         private val vibratoFreq: Double,
         private val phaseOffset: Double,
         private val vibrato: Double,
-        private val detune: Double,
-        private val freqOverride: Double?,
-        private val adsr: ADSR,
-        private val mix: Map<WaveType, WaveData>
+        private val mix: List<WaveData>
     ) : AudioNode(4, 2) {
-        private val osc = buildOscillator()
         private val vibratoNode = vibrato(vibrato, vibratoFreq)
-        private val adsrNode = ADSRNode(adsr.attack, adsr.decay, adsr.sustain, adsr.release)
 
-        private fun buildOscillator(): AudioNode {
-            var node: AudioNode? = null
-            for ((waveType, waveData) in mix) {
-                val phase = waveData.phase + phaseOffset
-                val wave = when (waveType) {
-                    WaveType.SINE -> OscillatorNode.sine(initialPhase = phase)
-                    WaveType.SQUARE -> OscillatorNode.square(initialPhase = phase)
-                    WaveType.SAWTOOTH -> OscillatorNode.saw(initialPhase = phase)
-                    WaveType.TRIANGLE -> OscillatorNode.triangle(initialPhase = phase)
-                    WaveType.SOFT_SQUARE -> OscillatorNode.softSquare(initialPhase = phase)
-                    WaveType.SOFT_SAWTOOTH -> OscillatorNode.softSaw(initialPhase = phase)
-                    WaveType.NOISE -> CustomNode.sink(1) stack NoiseNode()
-                }
-                node = if (node == null) {
-                    wave * waveData.amplitude
-                } else {
-                    node bus (wave * waveData.amplitude)
-                }
-            }
-            return node!!
+        private val waveNodes = mix.map { data ->
+            WaveNode(phaseOffset, data)
         }
 
         override fun process(ctx: Context, inputs: DoubleArray): DoubleArray {
-            val (freq, noteOn, velocity, randVal) = inputs
-            val actualFreq = freqOverride ?: freq
-            val detuneAmount = 1.0 + detune * (randVal * 2 - 1)
-            val modFreq = vibratoNode.process(ctx, doubleArrayOf(actualFreq))[0] * detuneAmount
-            val adsrVolume = adsrNode.process(ctx, doubleArrayOf(noteOn))[0]
-            val output = osc.process(ctx, doubleArrayOf(modFreq, 1.0, velocity))[0] * velocity * adsrVolume
+            val (freq, noteOn, velocity, _) = inputs
 
-            return doubleArrayOf(output, output)
+            val modFreq = vibratoNode.process(ctx, doubleArrayOf(freq))[0]
+
+            val outputs = waveNodes.map { it.process(ctx, doubleArrayOf(modFreq, noteOn, velocity)) }
+            val output = outputs.fold(doubleArrayOf(0.0, 0.0)) { acc, value ->
+                doubleArrayOf(acc[0] + value[0], acc[1] + value[1])
+            }
+
+            return output
         }
 
         override fun clone(): AudioNode {
-            return SynthNode(vibratoFreq, phaseOffset, vibrato, detune, freqOverride, adsr, mix)
+            return SynthNode(vibratoFreq, phaseOffset, vibrato, mix)
         }
 
         override fun init(ctx: Context) {
-            osc.init(ctx)
+            vibratoNode.init(ctx)
+            for (waveNode in waveNodes) {
+                waveNode.init(ctx)
+            }
         }
 
         override fun reset() {
-            osc.reset()
+            vibratoNode.reset()
+            for (waveNode in waveNodes) {
+                waveNode.reset()
+            }
         }
     }
 }

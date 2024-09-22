@@ -1,7 +1,10 @@
+package app
+
 import effects.*
 import nodes.AudioNode
 import nodes.pipe
 import util.json.*
+import java.util.*
 
 
 fun buildEffects(effects: List<SchemaData>): List<Effect> {
@@ -17,8 +20,8 @@ fun buildEffects(effects: List<SchemaData>): List<Effect> {
 }
 
 fun buildEffect(type: String, params: JsonElement): Effect {
-    when (type) {
-        "Highpass" -> {
+    when (type.lowercase()) {
+        "highpass" -> {
             val schema = ObjectSchema(
                 "cutoff" to NumberSchema() to false, "mix" to NumberSchema() to true, "q" to NumberSchema() to true
             )
@@ -29,7 +32,7 @@ fun buildEffect(type: String, params: JsonElement): Effect {
             return HighpassFilter(cutoff, q, mix)
         }
 
-        "Lowpass" -> {
+        "lowpass" -> {
             val schema = ObjectSchema(
                 "cutoff" to NumberSchema() to false, "mix" to NumberSchema() to true, "q" to NumberSchema() to true
             )
@@ -40,7 +43,7 @@ fun buildEffect(type: String, params: JsonElement): Effect {
             return LowpassFilter(cutoff, q, mix)
         }
 
-        "Distortion" -> {
+        "distortion" -> {
             val schema = ObjectSchema(
                 "hardness" to NumberSchema() to false, "mix" to NumberSchema() to true
             )
@@ -50,7 +53,7 @@ fun buildEffect(type: String, params: JsonElement): Effect {
             return DistortionEffect(hardness, mix)
         }
 
-        "Gain" -> {
+        "gain" -> {
             val schema = ObjectSchema("gain" to NumberSchema() to false)
             val parsed = schema.safeConvert(params).throwIfErr()
             val gain = parsed["gain"]!!.num().value.toDouble()
