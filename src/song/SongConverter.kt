@@ -1,9 +1,6 @@
 package song
 
-import midi.abstraction.Midi
-import midi.abstraction.NoteOnEvent
-import midi.abstraction.TempoChangeEvent
-import midi.abstraction.Timed
+import midi.abstraction.*
 
 class SongConverter {
     fun fromMidi(midi: Midi): Song {
@@ -24,7 +21,7 @@ class SongConverter {
                     } else if (event.velocity > 0.0) {
                         activeKeys[channelKey] = time to event.velocity
                     }
-                } else if (event is midi.abstraction.NoteOffEvent) {
+                } else if (event is NoteOffEvent) {
                     val channelKey = event.channel to event.key
                     val (startTime, velocity) = activeKeys[channelKey] ?: continue
                     val start = startTime.toDouble() / midi.tickRate

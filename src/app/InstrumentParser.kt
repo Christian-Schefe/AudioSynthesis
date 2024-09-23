@@ -70,7 +70,7 @@ fun buildSynth(synthName: String, params: JsonElement): Synth {
             val freqFactor = data["freqFactor"]?.num()?.value?.toDouble() ?: 1.0
             val freqOffset = data["freqOffset"]?.num()?.value?.toDouble() ?: 0.0
             val envelopes = data["envelopes"]!!.arr().elements.map { parseEnvelope(it) }
-            val waveType = WaveType.entries.find { it.id == type }!!
+            val waveType = WaveType.entries.find { it.id == type } ?: throw IllegalArgumentException("Unknown wave type $type")
             WaveData(waveType, amplitude, phase, freqFactor, freqOffset, envelopes)
         }
         val synth = SimpleSynth(vibrato, waves)

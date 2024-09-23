@@ -49,6 +49,7 @@ class Midi(
             for (track in file.tracks) {
                 val events = mutableListOf<Timed<MidiEvent>>()
                 var time = 0
+                var trackName = "Undefined"
                 for (event in track.events) {
                     time += event.deltaTime
                     MidiEvent.fromRawMessage(event)?.let { midiEvent ->
@@ -57,9 +58,12 @@ class Midi(
                         } else {
                             events.add(Timed(time, midiEvent))
                         }
+                        if (midiEvent is TrackNameEvent) {
+                            trackName = midiEvent.name
+                        }
                     }
                 }
-                tracks.add(MidiTrack("Track", events))
+                tracks.add(MidiTrack(trackName, events))
             }
 
             val tickRate = file.headerChunk.division.getTickRate()

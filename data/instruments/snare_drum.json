@@ -1,0 +1,85 @@
+{
+  "name": "snare drum",
+  "synth": "simpleSynth",
+  "params": {
+    "vibrato": 0.0,
+    "waves": [
+      {
+        "type": "soft square",
+        "amplitude": 0.2,
+        "freqFactor": 0.0,
+        "freqOffset": 200.0,
+        "envelopes": [
+          {
+            "type": "polynomial",
+            "params": {
+              "fadeTime": 0.3,
+              "power": 5
+            }
+          }
+        ]
+      },
+      {
+        "type": "soft square",
+        "amplitude": 0.2,
+        "freqFactor": 0.0,
+        "freqOffset": 300.0,
+        "envelopes": [
+          {
+            "type": "polynomial",
+            "params": {
+              "fadeTime": 0.3,
+              "power": 5
+            }
+          }
+        ]
+      },
+      {
+        "type": "sine",
+        "amplitude": 0.4,
+        "freqFactor": 0.0,
+        "freqOffset": 400.0,
+        "envelopes": [
+          {
+            "type": "polynomial",
+            "params": {
+              "fadeTime": 0.3,
+              "power": 5
+            }
+          }
+        ]
+      },
+      {
+        "type": "white noise",
+        "amplitude": 0.6,
+        "freqFactor": 0.0,
+        "freqOffset": 200.0,
+        "envelopes": [
+          {
+            "type": "polynomial",
+            "params": {
+              "fadeTime": 0.5,
+              "power": 3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "effects": [
+    {
+      "type": "lowpass",
+      "params": {
+        "cutoff": 2000.0,
+        "mix": 1.0
+      }
+    },
+    {
+      "type": "highpass",
+      "params": {
+        "cutoff": 200.0,
+        "mix": 0.7
+      }
+    }
+  ]
+}

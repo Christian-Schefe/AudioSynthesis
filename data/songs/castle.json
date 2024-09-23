@@ -21,7 +21,8 @@
     },
     {
       "tracks": [
-        2
+        2,
+        4
       ],
       "instrument": "violin",
       "volume": 0.2,

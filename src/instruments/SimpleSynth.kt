@@ -10,9 +10,10 @@ interface Synth {
 }
 
 enum class WaveType(val id: String) {
-    SINE("sine"), SQUARE("square"), SAWTOOTH("saw"), TRIANGLE("triangle"), SOFT_SQUARE("soft square"), SOFT_SAWTOOTH("soft saw"), NOISE(
-        "noise"
-    )
+    SINE("sine"), SQUARE("square"), SAWTOOTH("saw"), TRIANGLE("triangle"), SOFT_SQUARE("soft square"), SOFT_SAWTOOTH("soft saw"), WHITE_NOISE(
+        "white noise"
+    ),
+    PINK_NOISE("pink noise"), BROWN_NOISE("brown noise")
 }
 
 data class WaveData(
@@ -57,7 +58,9 @@ class SimpleSynth(
             WaveType.TRIANGLE -> OscillatorNode.triangle(data.amplitude, phaseOffset + data.phase)
             WaveType.SOFT_SQUARE -> OscillatorNode.softSquare(data.amplitude, phaseOffset + data.phase)
             WaveType.SOFT_SAWTOOTH -> OscillatorNode.softSaw(data.amplitude, phaseOffset + data.phase)
-            WaveType.NOISE -> CustomNode.sink(1) stack NoiseNode()
+            WaveType.WHITE_NOISE -> CustomNode.sink(1) stack NoiseNode()
+            WaveType.PINK_NOISE -> CustomNode.sink(1) stack NoiseNode() pipe PinkingFilter()
+            WaveType.BROWN_NOISE -> CustomNode.sink(1) stack NoiseNode() pipe PinkingFilter() pipe PinkingFilter()
         }
 
         override fun process(ctx: Context, inputs: DoubleArray): DoubleArray {

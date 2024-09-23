@@ -5,7 +5,7 @@
     "vibrato": 0.0,
     "waves": [
       {
-        "type": "noise",
+        "type": "white noise",
         "amplitude": 1.0,
         "freqFactor": 0.0,
         "freqOffset": 1000.0,
@@ -13,8 +13,8 @@
           {
             "type": "polynomial",
             "params": {
-              "fadeTime": 0.05,
-              "power": 0.1
+              "fadeTime": 0.1,
+              "power": 0.5
             }
           },
           {

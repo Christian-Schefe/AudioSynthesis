@@ -68,7 +68,7 @@
       "type": "highpass",
       "params": {
         "cutoff": 100.0,
-        "mix": 1.0,
+        "mix": 0.4,
         "q": 0.7
       }
     }

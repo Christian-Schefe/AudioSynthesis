@@ -32,6 +32,11 @@ abstract class MidiEvent {
                     TempoChangeEvent(bpm)
                 }
 
+                MetaEventStatus.SEQUENCE_TRACK_NAME -> {
+                    val name = message.data.decodeToString()
+                    TrackNameEvent(name)
+                }
+
                 else -> null
             }
         }
@@ -89,5 +94,18 @@ data class TempoChangeEvent(
 
     override fun toString(): String {
         return "TempoChangeEvent(bpm=$bpm)"
+    }
+}
+
+data class TrackNameEvent(
+    val name: String
+) : MidiEvent() {
+    override fun toRawEvent(deltaTime: Int): RawMessage {
+        val data = name.encodeToByteArray()
+        return RawMetaEvent(deltaTime, MetaEventStatus.SEQUENCE_TRACK_NAME, data)
+    }
+
+    override fun toString(): String {
+        return "TrackNameEvent(name='$name')"
     }
 }

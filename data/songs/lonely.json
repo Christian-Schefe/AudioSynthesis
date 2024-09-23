@@ -34,7 +34,7 @@
         0
       ],
       "instrument": "flute",
-      "volume": 0.3,
+      "volume": 0.4,
       "pan": 0.0,
       "effects": []
     },
@@ -49,9 +49,9 @@
         35,
         36
       ],
-      "instrument": "bassdrum",
+      "instrument": "kick drum",
       "volume": 0.2,
-      "pan": 0.0,
+      "pan": 0.1,
       "effects": []
     },
     {
@@ -81,9 +81,9 @@
       "notes": [
         38, 40
       ],
-      "instrument": "snare",
-      "volume": 0.2,
-      "pan": 0.0,
+      "instrument": "snare drum",
+      "volume": 0.3,
+      "pan": -0.1,
       "effects": []
     }
   ]

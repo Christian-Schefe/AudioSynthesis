@@ -2,16 +2,18 @@ package nodes
 
 import kotlin.random.Random
 
-class NoiseNode(outputCount: Int = 1): AudioNode(0, outputCount) {
+class NoiseNode : AudioNode(0, 1) {
+    var random = Random(0)
+
     override fun process(ctx: Context, inputs: DoubleArray): DoubleArray {
-        val output = DoubleArray(outputCount)
-        for (i in 0 ..< outputCount) {
-            output[i] = Random.nextDouble()
-        }
-        return output
+        return doubleArrayOf(random.nextDouble() * 2 - 1)
     }
 
     override fun clone(): AudioNode {
-        return NoiseNode(outputCount)
+        return NoiseNode()
+    }
+
+    override fun init(ctx: Context) {
+        random = ctx.random
     }
 }

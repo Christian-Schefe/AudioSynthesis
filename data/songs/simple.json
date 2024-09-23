@@ -1,0 +1,12 @@
+{
+  "midiFile": "data/midi/simple.mid",
+  "tracks": [
+    {
+      "tracks": [
+        1
+      ],
+      "instrument": "test",
+      "volume": 0.2
+    }
+  ]
+}

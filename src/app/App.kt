@@ -3,6 +3,7 @@ package app
 import instruments.MixerNode
 import nodes.*
 import playback.AudioPlayer
+import song.Song
 import wav.*
 import java.io.FileInputStream
 import kotlin.concurrent.thread
@@ -13,7 +14,7 @@ fun app() {
     val sampleRate = 44100
     val ctx = Context(0, sampleRate)
 
-    val json = FileInputStream("data/songs/palace.json").readAllBytes().decodeToString()
+    val json = FileInputStream("data/songs/castle.json").readAllBytes().decodeToString()
     val (song, voiceData) = parseSong(json)
 
     val instruments = readInstruments()
@@ -31,17 +32,28 @@ fun app() {
         mixer.addNode(node, data.volume, data.pan)
     }
 
+    printSongInfo(song)
+
     val clone = mixer.clone()
     val ctxClone = ctx.clone()
+    val playDuration = song.duration() + 2
 
     val handle = thread {
-        val wavFile = render(ctxClone, clone, song.duration() + 2)
+        val wavFile = render(ctxClone, clone, playDuration)
         save(wavFile, "output.wav")
     }
 
     val player = AudioPlayer()
-    player.renderAndPlay(mixer, ctx, song.duration() + 2)
+    player.renderAndPlay(mixer, ctx, playDuration)
     handle.join()
+}
+
+fun printSongInfo(song: Song) {
+    println("Song duration: ${song.duration()} seconds")
+    for (i in song.tracks.indices) {
+        val track = song.tracks[i]
+        println("Track $i (${track.name}): ${track.notes.size} notes")
+    }
 }
 
 fun render(ctx: Context, node: AudioNode, duration: Double): WavFile {

@@ -37,7 +37,7 @@
         ]
       },
       {
-        "type": "sine",
+        "type": "triangle",
         "amplitude": 0.2,
         "phase": 0.0,
         "freqFactor": 2.0,
