@@ -68,6 +68,9 @@ class InstrumentPlayer(
 
                 if (time >= data.endTime) {
                     voiceData[i] = null
+                    if (freeVoicesSet.add(i)) {
+                        freeVoicesQueue.add(i)
+                    }
                 }
             }
         }
@@ -93,6 +96,7 @@ class InstrumentPlayer(
                 val allowedNote = noteFilter.notes == null || note.key in noteFilter.notes
                 if (allowedChannel && allowedNote) {
                     if (freeVoicesSet.isEmpty()) {
+                        println("Warning: No free voices available")
                         break
                     }
                     val voice = freeVoicesQueue.removeFirst()
@@ -103,6 +107,7 @@ class InstrumentPlayer(
                     val releaseTime = song.tempoTrack.beatToTime(endBeat)
                     val releaseMoment = releaseTime - noteStartTime
                     val endTime = releaseTime + releaseTimeEvaluator.timeToSilence(releaseMoment)
+
                     voiceData[voice] = VoiceData(
                         midiNoteToFreq(note.key), note.velocity, releaseTime, endTime, random.nextDouble()
                     )

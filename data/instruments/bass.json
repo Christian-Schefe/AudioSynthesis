@@ -1,5 +1,5 @@
 {
-  "name": "guitar",
+  "name": "bass",
   "synth": "simpleSynth",
   "envelopes": {
     "adsr": {
@@ -32,6 +32,7 @@
         "type": "sine",
         "amplitude": 0.5,
         "phase": 0.0,
+        "freqFactor": 2.0,
         "envelopes": [
           "adsr"
         ]
@@ -39,12 +40,5 @@
     ]
   },
   "effects": [
-    {
-      "type": "distortion",
-      "params": {
-        "hardness": 2.0,
-        "mix": 1.0
-      }
-    }
   ]
 }

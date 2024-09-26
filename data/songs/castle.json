@@ -7,7 +7,7 @@
       ],
       "instrument": "piano",
       "volume": 0.2,
-      "pan": 0.0,
+      "pan": 0.05,
       "effects": []
     },
     {
@@ -16,13 +16,12 @@
       ],
       "instrument": "piano",
       "volume": 0.2,
-      "pan": 0.0,
+      "pan": -0.05,
       "effects": []
     },
     {
       "tracks": [
-        2,
-        4
+        2
       ],
       "instrument": "violin",
       "volume": 0.2,
@@ -35,7 +34,16 @@
       ],
       "instrument": "flute",
       "volume": 0.2,
-      "pan": 0.0,
+      "pan": 0.1,
+      "effects": []
+    },
+    {
+      "tracks": [
+        4
+      ],
+      "instrument": "cello",
+      "volume": 0.3,
+      "pan": -0.1,
       "effects": []
     }
   ]

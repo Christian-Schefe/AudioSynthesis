@@ -1,6 +1,22 @@
 {
   "name": "shaker",
   "synth": "simpleSynth",
+  "envelopes": {
+    "env1": {
+      "attack": [
+        {
+          "duration": 0.01,
+          "endValue": 1.0,
+          "steepness": 1.0
+        },
+        {
+          "duration": 0.1,
+          "endValue": 0.0,
+          "steepness": 0.5
+        }
+      ]
+    }
+  },
   "params": {
     "vibrato": 0.0,
     "waves": [
@@ -10,19 +26,7 @@
         "freqFactor": 0.0,
         "freqOffset": 1000.0,
         "envelopes": [
-          {
-            "type": "polynomial",
-            "params": {
-              "fadeTime": 0.1,
-              "power": 0.5
-            }
-          },
-          {
-            "type": "fadeIn",
-            "params": {
-              "fadeTime": 0.01
-            }
-          }
+          "env1"
         ]
       }
     ]

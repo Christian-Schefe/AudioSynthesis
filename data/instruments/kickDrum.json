@@ -1,6 +1,36 @@
 {
   "name": "kick drum",
   "synth": "simpleSynth",
+  "envelopes": {
+    "env1": {
+      "attack": [
+        {
+          "duration": 0.0,
+          "endValue": 1.0,
+          "steepness": 1.0
+        },
+        {
+          "duration": 0.1,
+          "endValue": 0.0,
+          "steepness": 3.0
+        }
+      ]
+    },
+    "env2": {
+      "attack": [
+        {
+          "duration": 0.0,
+          "endValue": 1.0,
+          "steepness": 1.0
+        },
+        {
+          "duration": 0.03,
+          "endValue": 0.0,
+          "steepness": 0.1
+        }
+      ]
+    }
+  },
   "params": {
     "vibrato": 0.0,
     "waves": [
@@ -8,45 +38,27 @@
         "type": "soft square",
         "amplitude": 0.2,
         "freqFactor": 0.0,
-        "freqOffset": 50.0,
+        "freqOffset": 49.0,
         "envelopes": [
-          {
-            "type": "polynomial",
-            "params": {
-              "fadeTime": 0.1,
-              "power": 3
-            }
-          }
+          "env1"
         ]
       },
       {
         "type": "sine",
         "amplitude": 0.7,
         "freqFactor": 0.0,
-        "freqOffset": 100.0,
+        "freqOffset": 98.0,
         "envelopes": [
-          {
-            "type": "polynomial",
-            "params": {
-              "fadeTime": 0.1,
-              "power": 3
-            }
-          }
+          "env1"
         ]
       },
       {
         "type": "white noise",
         "amplitude": 0.1,
         "freqFactor": 0.0,
-        "freqOffset": 50.0,
+        "freqOffset": 49.0,
         "envelopes": [
-          {
-            "type": "polynomial",
-            "params": {
-              "fadeTime": 0.03,
-              "power": 0.1
-            }
-          }
+          "env2"
         ]
       }
     ]

@@ -1,25 +1,18 @@
 {
-  "name": "piano",
+  "name": "bells",
   "synth": "simpleSynth",
   "envelopes": {
-    "adsr": {
+    "env1": {
       "attack": [
         {
-          "duration": 0.02,
+          "duration": 0.01,
           "endValue": 1.0,
           "steepness": 1.0
         },
         {
-          "duration": 1.0,
-          "endValue": 0.1,
-          "steepness": 1.0
-        }
-      ],
-      "release": [
-        {
-          "duration": 0.5,
+          "duration": 4.0,
           "endValue": 0.0,
-          "steepness": 1.0
+          "steepness": 0.5
         }
       ]
     }
@@ -29,39 +22,42 @@
     "waves": [
       {
         "type": "sine",
-        "amplitude": 0.7,
+        "amplitude": 0.6,
         "phase": 0.0,
+        "freqFactor": 1.0,
         "envelopes": [
-          "adsr"
+          "env1"
         ]
       },
       {
         "type": "sine",
         "amplitude": 0.2,
         "phase": 0.0,
-        "freqFactor": 2.0,
+        "freqFactor": 1.2,
         "envelopes": [
-          "adsr"
+          "env1"
         ]
       },
       {
-        "type": "soft saw",
-        "amplitude": 0.3,
-        "phase": 0.5,
+        "type": "sine",
+        "amplitude": 0.1,
+        "phase": 0.0,
+        "freqFactor": 1.5,
         "envelopes": [
-          "adsr"
+          "env1"
+        ]
+      },
+      {
+        "type": "sine",
+        "amplitude": 0.4,
+        "phase": 0.0,
+        "freqFactor": 2.0,
+        "envelopes": [
+          "env1"
         ]
       }
     ]
   },
   "effects": [
-    {
-      "type": "lowpass",
-      "params": {
-        "cutoff": 2000.0,
-        "mix": 0.7,
-        "q": 1.0
-      }
-    }
   ]
 }

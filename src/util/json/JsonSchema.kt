@@ -62,6 +62,7 @@ abstract class JsonSchema {
 
 abstract class SchemaData {
     fun obj(): ObjectSchema.ObjectData = this as ObjectSchema.ObjectData
+    fun map(): MapSchema.MapData = this as MapSchema.MapData
     fun tuple(): TupleSchema.TupleData = this as TupleSchema.TupleData
     fun arr(): ArraySchema.ArrayData = this as ArraySchema.ArrayData
     fun enum(): EnumSchema.EnumData = this as EnumSchema.EnumData
@@ -114,6 +115,32 @@ class ObjectSchema(private val properties: Map<String, Pair<JsonSchema, Boolean>
     }
 
     data class ObjectData(val properties: Map<String, SchemaData?>) : SchemaData() {
+        override operator fun get(key: String): SchemaData? = properties[key]
+    }
+}
+
+class MapSchema(private val schema: JsonSchema) : JsonSchema() {
+    override fun validateInternal(path: MutableList<String>, json: JsonElement): ValidationError? {
+        if (json !is JsonObject) return ValidationError(path.toTypedArray(), "Expected object")
+        for ((key, value) in json) {
+            path.add(key)
+            val err = schema.validateInternal(path, value)
+            path.removeLast()
+            if (err != null) return err
+        }
+        return null
+    }
+
+    override fun convertInternal(json: JsonElement): SchemaData {
+        require(json is JsonObject)
+        val properties = mutableMapOf<String, SchemaData>()
+        for ((key, value) in json) {
+            properties[key] = schema.convertInternal(value)
+        }
+        return MapData(properties)
+    }
+
+    data class MapData(val properties: Map<String, SchemaData>) : SchemaData() {
         override operator fun get(key: String): SchemaData? = properties[key]
     }
 }
