@@ -1,7 +1,5 @@
-package instruments
+package nodes
 
-import nodes.AudioNode
-import nodes.Context
 import kotlin.math.min
 
 class MixerNode : AudioNode(0, 2) {

@@ -37,6 +37,16 @@ abstract class MidiEvent {
                     TrackNameEvent(name)
                 }
 
+                MetaEventStatus.INSTRUMENT_NAME -> {
+                    val name = message.data.decodeToString()
+                    InstrumentNameEvent(name)
+                }
+
+                MetaEventStatus.TEXT_EVENT -> {
+                    val text = message.data.decodeToString()
+                    TextEvent(text)
+                }
+
                 else -> null
             }
         }
@@ -107,5 +117,31 @@ data class TrackNameEvent(
 
     override fun toString(): String {
         return "TrackNameEvent(name='$name')"
+    }
+}
+
+data class InstrumentNameEvent(
+    val name: String
+) : MidiEvent() {
+    override fun toRawEvent(deltaTime: Int): RawMessage {
+        val data = name.encodeToByteArray()
+        return RawMetaEvent(deltaTime, MetaEventStatus.INSTRUMENT_NAME, data)
+    }
+
+    override fun toString(): String {
+        return "InstrumentNameEvent(name='$name')"
+    }
+}
+
+data class TextEvent(
+    val text: String
+) : MidiEvent() {
+    override fun toRawEvent(deltaTime: Int): RawMessage {
+        val data = text.encodeToByteArray()
+        return RawMetaEvent(deltaTime, MetaEventStatus.TEXT_EVENT, data)
+    }
+
+    override fun toString(): String {
+        return "TextEvent(text='$text')"
     }
 }

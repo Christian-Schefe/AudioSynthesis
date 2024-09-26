@@ -10,25 +10,6 @@ class AudioRenderer(private val ctx: Context, private val audioNode: AudioNode) 
         require(audioNode.inputCount == 0)
     }
 
-    fun renderMono(seconds: Double, channels: Int = 2): Array<DoubleArray> {
-        val ticks = (sampleRate * seconds).toInt()
-
-        val outputs = Array(channels) { mutableListOf<Double>() }
-
-        audioNode.init(ctx)
-
-        for (i in 0..<ticks) {
-            val inputs = DoubleArray(0)
-            val nodeOutput = audioNode.process(ctx, inputs)[0]
-            for (channelIndex in 0..<channels) {
-                outputs[channelIndex].add(nodeOutput)
-            }
-            ctx.tick()
-        }
-
-        return outputs.map { it.toDoubleArray() }.toTypedArray()
-    }
-
     fun renderStereo(seconds: Double, channels: Int = 2): Array<DoubleArray> {
         val ticks = (sampleRate * seconds).toInt()
 

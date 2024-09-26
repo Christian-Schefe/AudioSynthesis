@@ -2,9 +2,8 @@ package app
 
 import effects.*
 import nodes.AudioNode
-import nodes.pipe
+import nodes.Pipeline
 import util.json.*
-import java.util.*
 
 
 fun buildEffects(effects: List<SchemaData>): List<Effect> {
@@ -60,7 +59,7 @@ fun buildEffect(type: String, params: JsonElement): Effect {
             return GainEffect(gain)
         }
 
-        else -> return NoEffect()
+        else -> throw IllegalArgumentException("Unknown effect type: $type")
     }
 }
 
@@ -74,9 +73,6 @@ fun effectsSchema(): JsonSchema {
 }
 
 fun applyEffects(node: AudioNode, effects: List<Effect>): AudioNode {
-    var result = node
-    for (effect in effects) {
-        result = result pipe effect.buildNode()
-    }
-    return result
+    val effectNodes = effects.map { it.buildNode() }
+    return Pipeline(listOf(node) + effectNodes)
 }

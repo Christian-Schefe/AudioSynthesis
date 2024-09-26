@@ -30,7 +30,13 @@ class SongConverter {
                     activeKeys.remove(channelKey)
                 }
             }
-            tracks.add(Track(track.name, notes))
+            tracks.add(
+                Track(
+                    TrackMetadata(
+                        track.metadata.trackName, track.metadata.instrumentName, track.metadata.textMessages
+                    ), notes
+                )
+            )
         }
         return Song(tracks, tempoTrack)
     }

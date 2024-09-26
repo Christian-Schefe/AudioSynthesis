@@ -1,6 +1,6 @@
 package app
 
-import instruments.MixerNode
+import nodes.MixerNode
 import nodes.*
 import playback.AudioPlayer
 import song.Song
@@ -14,7 +14,7 @@ fun app() {
     val sampleRate = 44100
     val ctx = Context(0, sampleRate)
 
-    val json = FileInputStream("data/songs/lonely.json").readAllBytes().decodeToString()
+    val json = FileInputStream("data/songs/bohemian_rhapsody.json").readAllBytes().decodeToString()
     val (song, mixer) = parse(ctx, json)
 
     val mixerClone = mixer.clone()
@@ -57,7 +57,7 @@ fun printSongInfo(song: Song) {
     println("Song duration: ${song.duration()} seconds")
     for (i in song.tracks.indices) {
         val track = song.tracks[i]
-        println("Track $i (${track.name}): ${track.notes.size} notes")
+        println("Track $i (${track.metadata}): ${track.notes.size} notes")
     }
 }
 

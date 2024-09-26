@@ -2,28 +2,16 @@ package effects
 
 import nodes.*
 import nodes.Distortion
-import kotlin.random.Random
 
 interface Effect {
     fun buildNode(): AudioNode
-}
-
-class NoEffect : Effect {
-    override fun buildNode(): AudioNode {
-        return CustomNode.pass(2)
-    }
-}
-
-fun mixer(node: AudioNode, mix: Double): AudioNode {
-    return (CustomNode.pass(1) branch node stack mix) pipe LerpNode()
 }
 
 class LowpassFilter(
     private val frequency: Double, private val q: Double, private val mix: Double
 ) : Effect {
     override fun buildNode(): AudioNode {
-        val singleChannelNode = mixer(BiquadFilter.lowpass(frequency, q), mix)
-        return singleChannelNode stack singleChannelNode.clone()
+        return StereoMixNode(BiquadFilter.lowpass(frequency, q) to BiquadFilter.lowpass(frequency, q), mix)
     }
 }
 
@@ -31,8 +19,31 @@ class HighpassFilter(
     private val frequency: Double, private val q: Double, private val mix: Double
 ) : Effect {
     override fun buildNode(): AudioNode {
-        val singleChannelNode = mixer(BiquadFilter.highpass(frequency, q), mix)
-        return singleChannelNode stack singleChannelNode.clone()
+        return StereoMixNode(BiquadFilter.highpass(frequency, q) to BiquadFilter.highpass(frequency, q), mix)
+    }
+}
+
+class StereoMixNode(private val nodes: Pair<AudioNode, AudioNode>, val mix: Double) : AudioNode(2, 2) {
+    override fun process(ctx: Context, inputs: DoubleArray): DoubleArray {
+        val left = nodes.first.process(ctx, doubleArrayOf(inputs[0]))[0]
+        val right = nodes.second.process(ctx, doubleArrayOf(inputs[1]))[0]
+        val mixedLeft = inputs[0] + (left - inputs[0]) * mix
+        val mixedRight = inputs[1] + (right - inputs[1]) * mix
+        return doubleArrayOf(mixedLeft, mixedRight)
+    }
+
+    override fun clone(): AudioNode {
+        return StereoMixNode(nodes.first.clone() to nodes.second.clone(), mix)
+    }
+
+    override fun reset() {
+        nodes.first.reset()
+        nodes.second.reset()
+    }
+
+    override fun init(ctx: Context) {
+        nodes.first.init(ctx)
+        nodes.second.init(ctx)
     }
 }
 
@@ -40,8 +51,7 @@ class DistortionEffect(
     private val hardness: Double, private val mix: Double
 ) : Effect {
     override fun buildNode(): AudioNode {
-        val singleChannelNode = mixer(Distortion.tanh(hardness), mix)
-        return singleChannelNode stack singleChannelNode.clone()
+        return StereoMixNode(Distortion.tanh(hardness) to Distortion.tanh(hardness), mix)
     }
 }
 

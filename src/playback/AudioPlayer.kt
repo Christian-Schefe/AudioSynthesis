@@ -1,9 +1,6 @@
 package playback
 
-import nodes.AudioNode
-import nodes.Context
-import nodes.LookaheadLimiter
-import nodes.pipe
+import nodes.*
 import util.bytes.ByteConverter
 import util.bytes.Endianness
 import wav.WavFile
@@ -46,7 +43,7 @@ class AudioPlayer {
         val lineInfo = DataLine.Info(SourceDataLine::class.java, format)
         val line = AudioSystem.getLine(lineInfo) as SourceDataLine
 
-        val node = audioNode pipe LookaheadLimiter(channels, 0.99, 0.1, 2.0)
+        val node = Pipeline(listOf(audioNode, LookaheadLimiter(channels, 0.99, 0.1, 2.0)))
 
         line.open(format)
         line.start()

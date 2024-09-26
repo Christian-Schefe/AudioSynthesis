@@ -58,9 +58,9 @@ class SimpleSynth(
             WaveType.TRIANGLE -> OscillatorNode.triangle(data.amplitude, phaseOffset + data.phase)
             WaveType.SOFT_SQUARE -> OscillatorNode.softSquare(data.amplitude, phaseOffset + data.phase)
             WaveType.SOFT_SAWTOOTH -> OscillatorNode.softSaw(data.amplitude, phaseOffset + data.phase)
-            WaveType.WHITE_NOISE -> CustomNode.sink(1) stack NoiseNode()
-            WaveType.PINK_NOISE -> CustomNode.sink(1) stack NoiseNode() pipe PinkingFilter()
-            WaveType.BROWN_NOISE -> CustomNode.sink(1) stack NoiseNode() pipe PinkingFilter() pipe PinkingFilter()
+            WaveType.WHITE_NOISE -> IgnoreInputsNode(1, NoiseNode())
+            WaveType.PINK_NOISE -> Pipeline(listOf(SinkNode(1), NoiseNode(), PinkingFilter()))
+            WaveType.BROWN_NOISE -> Pipeline(listOf(SinkNode(1), NoiseNode(), PinkingFilter(), PinkingFilter()))
         }
 
         override fun process(ctx: Context, inputs: DoubleArray): DoubleArray {
@@ -99,7 +99,7 @@ class SimpleSynth(
         private val vibrato: Double,
         private val mix: List<WaveData>
     ) : AudioNode(4, 2) {
-        private val vibratoNode = vibrato(vibrato, vibratoFreq)
+        private val vibratoNode = VibratoNode(1.0, vibrato, vibratoFreq)
 
         private val waveNodes = mix.map { data ->
             WaveNode(phaseOffset, data)

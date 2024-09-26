@@ -10,7 +10,6 @@ fun interface ReleaseTimeEvaluator {
     fun timeToSilence(releaseMoment: Double): Double
 }
 
-data class InstrumentSettings(val maxRelease: Double, val maxDecay: Double)
 data class NoteFilter(val tracks: List<Int>, val channels: List<Int>?, val notes: List<Int>?)
 
 class InstrumentPlayer(

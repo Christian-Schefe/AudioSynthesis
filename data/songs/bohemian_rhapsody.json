@@ -1,24 +1,6 @@
 {
-  "midiFile": "data/midi/castles.mid",
+  "midiFile": "data/midi/bohemian_rhapsody.mid",
   "tracks": [
-    {
-      "instrument": "piano",
-      "tracks": [
-        1
-      ],
-      "volume": 0.2,
-      "pan": 0.0,
-      "effects": []
-    },
-    {
-      "instrument": "piano",
-      "tracks": [
-        2
-      ],
-      "volume": 0.2,
-      "pan": 0.0,
-      "effects": []
-    },
     {
       "instrument": "piano",
       "tracks": [
@@ -38,9 +20,41 @@
       "effects": []
     },
     {
+      "instrument": "violin",
+      "tracks": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "instrument": "flute",
+      "tracks": [
+        1,
+        2
+      ],
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "instrument": "guitar",
+      "tracks": [
+        9,
+        10
+      ],
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
       "instrument": "kick drum",
       "tracks": [
-        10
+        12
       ],
       "notes": [
         35,
@@ -53,7 +67,7 @@
     {
       "instrument": "shaker",
       "tracks": [
-        10
+        12
       ],
       "notes": [
         42,
@@ -67,7 +81,7 @@
     {
       "instrument": "snare drum",
       "tracks": [
-        10
+        12
       ],
       "notes": [
         38,
