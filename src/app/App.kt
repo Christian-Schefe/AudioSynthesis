@@ -7,21 +7,26 @@ import song.Song
 import wav.*
 import java.io.FileInputStream
 import kotlin.concurrent.thread
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 import kotlin.time.measureTimedValue
+import kotlin.time.toDuration
 
 
 fun app() {
     val sampleRate = 44100
     val ctx = Context(0, sampleRate)
 
-    val json = FileInputStream("data/songs/bohemian_rhapsody2.json").readAllBytes().decodeToString()
+    val path = askInput(scanSongs("data/songs"))
+
+    val json = FileInputStream(path).readAllBytes().decodeToString()
     val (song, mixer) = parse(ctx, json)
 
     val mixerClone = mixer.clone()
     val ctxClone = ctx.clone()
     val playDuration = song.duration() + 2
 
-    val shouldRender = true
+    val shouldRender = askShouldRender()
 
     val handle = if (shouldRender) {
         thread {
@@ -66,7 +71,8 @@ fun printSongInfo(song: Song) {
 }
 
 fun render(ctx: Context, node: AudioNode, duration: Double): WavFile {
-    println("Rendering $duration seconds of audio...")
+    val dur = duration.toDuration(DurationUnit.SECONDS)
+    println("Rendering $dur of audio...")
 
     val renderer = AudioRenderer(ctx, node)
     val (samples, timeTaken) = measureTimedValue {

@@ -1,10 +1,20 @@
 {
-  "midiFile": "data/midi/bohemian_rhapsody.mid",
+  "midiFile": "data/midi/HotelCalifornia.mid",
   "tracks": [
     {
       "instrument": "piano",
       "tracks": [
-        3
+        2
+      ],
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "instrument": "guitar",
+      "tracks": [
+        1,
+        5
       ],
       "volume": 0.2,
       "pan": 0.0,
@@ -13,6 +23,15 @@
     {
       "instrument": "bass",
       "tracks": [
+        3
+      ],
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "instrument": "flute",
+      "tracks": [
         4
       ],
       "volume": 0.2,
@@ -20,73 +39,9 @@
       "effects": []
     },
     {
-      "instrument": "violin",
-      "tracks": [
-        5
-      ],
-      "volume": 0.2,
-      "pan": -0.2,
-      "effects": []
-    },
-    {
-      "instrument": "violin",
-      "tracks": [
-        6
-      ],
-      "volume": 0.2,
-      "pan": -0.1,
-      "effects": []
-    },
-    {
-      "instrument": "violin",
-      "tracks": [
-        7
-      ],
-      "volume": 0.2,
-      "pan": 0.1,
-      "effects": []
-    },
-    {
-      "instrument": "violin",
-      "tracks": [
-        8
-      ],
-      "volume": 0.2,
-      "pan": 0.2,
-      "effects": []
-    },
-    {
-      "instrument": "flute",
-      "tracks": [
-        1,
-        2
-      ],
-      "volume": 0.2,
-      "pan": 0.0,
-      "effects": []
-    },
-    {
-      "instrument": "piano",
-      "tracks": [
-        9
-      ],
-      "volume": 0.2,
-      "pan": 0.1,
-      "effects": []
-    },
-    {
-      "instrument": "piano",
-      "tracks": [
-        10
-      ],
-      "volume": 0.2,
-      "pan": -0.1,
-      "effects": []
-    },
-    {
       "instrument": "kick drum",
       "tracks": [
-        12
+        6
       ],
       "notes": [
         35,
@@ -99,21 +54,21 @@
     {
       "instrument": "shaker",
       "tracks": [
-        12
+        6
       ],
       "notes": [
         42,
         44,
         46
       ],
-      "volume": 0.1,
+      "volume": 0.2,
       "pan": 0.0,
       "effects": []
     },
     {
       "instrument": "snare drum",
       "tracks": [
-        12
+        6
       ],
       "notes": [
         38,

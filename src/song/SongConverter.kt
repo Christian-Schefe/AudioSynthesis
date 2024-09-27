@@ -69,7 +69,7 @@ class SongConverter {
             in 112..119 -> "Percussive"
             in 120..127 -> "Sound Effects"
             else -> "Undefined"
-        } + if (program in instruments.indices) "(${instruments[program]})" else "(${program + 1})"
+        } + if (program in instruments.indices) ": ${instruments[program]}" else ": ${program + 1}"
     }
 
     private val instruments = arrayOf(

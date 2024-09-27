@@ -1,0 +1,66 @@
+{
+  "midiFile": "data/midi/WakeMeUpWhenSeptemberEnds.mid",
+  "tracks": [
+    {
+      "instrument": "piano",
+      "tracks": [
+        2,
+        3
+      ],
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "instrument": "guitar",
+      "tracks": [
+        1,
+        4,
+        5
+      ],
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "instrument": "kick drum",
+      "tracks": [
+        6
+      ],
+      "notes": [
+        35,
+        36
+      ],
+      "volume": 0.2,
+      "pan": 0.1,
+      "effects": []
+    },
+    {
+      "instrument": "shaker",
+      "tracks": [
+        6
+      ],
+      "notes": [
+        42,
+        44,
+        46
+      ],
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "instrument": "snare drum",
+      "tracks": [
+        6
+      ],
+      "notes": [
+        38,
+        40
+      ],
+      "volume": 0.15,
+      "pan": -0.1,
+      "effects": []
+    }
+  ]
+}
