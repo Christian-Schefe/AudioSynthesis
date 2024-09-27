@@ -1,73 +1,47 @@
 {
-  "midiFile": "data/midi/lonely.mid",
+  "midiFile": "data/midi/Creep.mid",
   "tracks": [
     {
-      "tracks": [
-        0
-      ],
-      "channels": [
-        4
-      ],
       "instrument": "piano",
-      "volume": 0.2,
-      "pan": 0.0,
-      "effects": []
-    },
-    {
       "tracks": [
-        0
-      ],
-      "channels": [
-        2
-      ],
-      "instrument": "guitar",
-      "volume": 0.2,
-      "pan": 0.5,
-      "effects": []
-    },
-    {
-      "tracks": [
-        0
-      ],
-      "channels": [
-        3
-      ],
-      "instrument": "guitar",
-      "volume": 0.2,
-      "pan": -0.5,
-      "effects": []
-    },
-    {
-      "tracks": [
-        0
-      ],
-      "channels": [
-        0
-      ],
-      "instrument": "flute",
-      "volume": 0.4,
-      "pan": 0.0,
-      "effects": []
-    },
-    {
-      "tracks": [
-        0
-      ],
-      "channels": [
-        5,
         6
       ],
-      "instrument": "bells",
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "instrument": "flute",
+      "tracks": [
+        3,
+        4
+      ],
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "instrument": "bass",
+      "tracks": [
+        7
+      ],
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "instrument": "violin",
+      "tracks": [
+        5
+      ],
       "volume": 0.2,
       "pan": 0.0,
       "effects": []
     },
     {
       "tracks": [
-        0
-      ],
-      "channels": [
-        9
+        1,
+        2
       ],
       "notes": [
         35,
@@ -80,10 +54,8 @@
     },
     {
       "tracks": [
-        0
-      ],
-      "channels": [
-        9
+        1,
+        2
       ],
       "notes": [
         42,
@@ -97,30 +69,16 @@
     },
     {
       "tracks": [
-        0
-      ],
-      "channels": [
-        9
+        1,
+        2
       ],
       "notes": [
         38,
         40
       ],
       "instrument": "snare drum",
-      "volume": 0.3,
-      "pan": -0.1,
-      "effects": []
-    },
-    {
-      "tracks": [
-        0
-      ],
-      "channels": [
-        1
-      ],
-      "instrument": "bass",
       "volume": 0.2,
-      "pan": 0.0,
+      "pan": -0.1,
       "effects": []
     }
   ]

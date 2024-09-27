@@ -21,6 +21,11 @@ abstract class MidiEvent {
                     NoteOffEvent(message.channel.toInt(), key)
                 }
 
+                ChannelMessageStatus.PROGRAM_CHANGE -> {
+                    val program = message.data[0].toInt()
+                    ProgramChangeEvent(message.channel.toInt(), program)
+                }
+
                 else -> null
             }
         }
@@ -87,6 +92,20 @@ data class NoteOffEvent(
 
     override fun toString(): String {
         return "NoteOffEvent(channel=$channel, key=$key)"
+    }
+}
+
+data class ProgramChangeEvent(
+    val channel: Int, val program: Int
+) : MidiEvent() {
+    override fun toRawEvent(deltaTime: Int): RawMessage {
+        return RawChannelVoiceMessage(
+            deltaTime, ChannelMessageStatus.PROGRAM_CHANGE, channel.toByte(), byteArrayOf(program.toByte())
+        )
+    }
+
+    override fun toString(): String {
+        return "ProgramChangeEvent(channel=$channel, program=$program)"
     }
 }
 

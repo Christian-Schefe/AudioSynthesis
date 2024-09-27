@@ -5,7 +5,7 @@
     "env1": {
       "attack": [
         {
-          "duration": 0.0,
+          "duration": 0.0025,
           "endValue": 1.0,
           "steepness": 1.0
         },
@@ -19,14 +19,14 @@
     "env2": {
       "attack": [
         {
-          "duration": 0.0,
+          "duration": 0.0025,
           "endValue": 1.0,
           "steepness": 1.0
         },
         {
           "duration": 0.03,
           "endValue": 0.0,
-          "steepness": 0.1
+          "steepness": 0.3
         }
       ]
     }
@@ -74,7 +74,7 @@
     {
       "type": "gain",
       "params": {
-        "gain": 2.0
+        "gain": 1.0
       }
     }
   ]

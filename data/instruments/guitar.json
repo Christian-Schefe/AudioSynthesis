@@ -14,6 +14,13 @@
           "endValue": 0.0,
           "steepness": 1.0
         }
+      ],
+      "release": [
+        {
+          "duration": 0.3,
+          "endValue": 0.0,
+          "steepness": 1.0
+        }
       ]
     }
   },
@@ -44,6 +51,14 @@
       "params": {
         "hardness": 2.0,
         "mix": 1.0
+      }
+    },
+    {
+      "type": "highpass",
+      "params": {
+        "cutoff": 100.0,
+        "q": 1.0,
+        "mix": 0.2
       }
     }
   ]

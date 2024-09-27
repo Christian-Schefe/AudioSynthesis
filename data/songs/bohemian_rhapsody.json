@@ -22,13 +22,37 @@
     {
       "instrument": "violin",
       "tracks": [
-        5,
-        6,
-        7,
+        5
+      ],
+      "volume": 0.2,
+      "pan": -0.2,
+      "effects": []
+    },
+    {
+      "instrument": "violin",
+      "tracks": [
+        6
+      ],
+      "volume": 0.2,
+      "pan": -0.1,
+      "effects": []
+    },
+    {
+      "instrument": "violin",
+      "tracks": [
+        7
+      ],
+      "volume": 0.2,
+      "pan": 0.1,
+      "effects": []
+    },
+    {
+      "instrument": "violin",
+      "tracks": [
         8
       ],
       "volume": 0.2,
-      "pan": 0.0,
+      "pan": 0.2,
       "effects": []
     },
     {
@@ -42,13 +66,21 @@
       "effects": []
     },
     {
-      "instrument": "guitar",
+      "instrument": "piano",
       "tracks": [
-        9,
+        9
+      ],
+      "volume": 0.2,
+      "pan": 0.1,
+      "effects": []
+    },
+    {
+      "instrument": "piano",
+      "tracks": [
         10
       ],
       "volume": 0.2,
-      "pan": 0.0,
+      "pan": -0.1,
       "effects": []
     },
     {
@@ -74,7 +106,7 @@
         44,
         46
       ],
-      "volume": 0.2,
+      "volume": 0.1,
       "pan": 0.0,
       "effects": []
     },

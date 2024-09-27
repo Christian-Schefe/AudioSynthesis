@@ -14,21 +14,25 @@ fun app() {
     val sampleRate = 44100
     val ctx = Context(0, sampleRate)
 
-    val json = FileInputStream("data/songs/bohemian_rhapsody.json").readAllBytes().decodeToString()
+    val json = FileInputStream("data/songs/bohemian_rhapsody2.json").readAllBytes().decodeToString()
     val (song, mixer) = parse(ctx, json)
 
     val mixerClone = mixer.clone()
     val ctxClone = ctx.clone()
     val playDuration = song.duration() + 2
 
-    val handle = thread {
-        val wavFile = render(ctxClone, mixerClone, playDuration)
-        save(wavFile, "output.wav")
-    }
+    val shouldRender = true
+
+    val handle = if (shouldRender) {
+        thread {
+            val wavFile = render(ctxClone, mixerClone, playDuration)
+            save(wavFile, "output.wav")
+        }
+    } else null
 
     val player = AudioPlayer()
     player.renderAndPlay(mixer, ctx, playDuration)
-    handle.join()
+    handle?.join()
 }
 
 fun parse(ctx: Context, json: String): Pair<Song, MixerNode> {

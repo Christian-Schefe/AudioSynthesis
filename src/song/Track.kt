@@ -1,8 +1,13 @@
 package song
 
-class TrackMetadata(val trackName: String, val instrumentName: String, val textMessages: List<String>) {
+class TrackMetadata(
+    val trackName: String,
+    val instrumentName: String,
+    val textMessages: List<String>,
+    val programChanges: List<Pair<String, Int>>
+) {
     override fun toString(): String {
-        return "TrackMetadata(trackName='$trackName', instrumentName='$instrumentName', textMessages=$textMessages)"
+        return "TrackMetadata(trackName='$trackName', instrumentName='$instrumentName', textMessages=$textMessages, programChanges=$programChanges)"
     }
 }
 

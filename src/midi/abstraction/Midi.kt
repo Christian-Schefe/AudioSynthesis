@@ -4,8 +4,7 @@ import midi.raw.*
 
 data class Timed<out T>(val time: Int, val value: T)
 
-class MidiTrackMetadata(val trackName: String, val instrumentName: String, val textMessages: List<String>)
-class MidiTrack(val metadata: MidiTrackMetadata, val events: List<Timed<MidiEvent>>)
+class MidiTrack(val events: List<Timed<MidiEvent>>)
 
 class Midi(
     val tickRate: Int, val events: List<MidiTrack>, val tempoChanges: List<Timed<TempoChangeEvent>>
@@ -50,9 +49,6 @@ class Midi(
             for (track in file.tracks) {
                 val events = mutableListOf<Timed<MidiEvent>>()
                 var time = 0
-                var trackName = "Undefined"
-                var instrumentName = "Undefined"
-                val textMessages = mutableListOf<String>()
                 for (event in track.events) {
                     time += event.deltaTime
                     MidiEvent.fromRawMessage(event)?.let { midiEvent ->
@@ -61,17 +57,10 @@ class Midi(
                         } else {
                             events.add(Timed(time, midiEvent))
                         }
-
-                        if (midiEvent is TrackNameEvent) {
-                            trackName = midiEvent.name
-                        } else if (midiEvent is InstrumentNameEvent) {
-                            instrumentName = midiEvent.name
-                        } else if (midiEvent is TextEvent) {
-                            textMessages.add(midiEvent.text)
-                        }
                     }
                 }
-                tracks.add(MidiTrack(MidiTrackMetadata(trackName, instrumentName, textMessages), events))
+
+                tracks.add(MidiTrack(events))
             }
 
             val tickRate = file.headerChunk.division.getTickRate()
