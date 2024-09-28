@@ -1,0 +1,156 @@
+{
+  "midiFile": "data/midi/SomebodyThatIUsedToKnow.mid",
+  "tracks": [
+    {
+      "instrument": "xylophone",
+      "tracks": [
+        1
+      ],
+      "volume": 0.1,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "instrument": "guitar",
+      "tracks": [
+        8
+      ],
+      "volume": 0.2,
+      "pan": -0.1,
+      "effects": []
+    },
+    {
+      "instrument": "guitar",
+      "tracks": [
+        9
+      ],
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "instrument": "guitar",
+      "tracks": [
+        10
+      ],
+      "volume": 0.2,
+      "pan": 0.1,
+      "effects": []
+    },
+    {
+      "instrument": "guitar",
+      "tracks": [
+        13,
+        14,
+        15
+      ],
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "instrument": "xylophone",
+      "tracks": [
+        12
+      ],
+      "volume": 0.1,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "instrument": "bass",
+      "tracks": [
+        2
+      ],
+      "volume": 0.25,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "instrument": "flute",
+      "tracks": [
+        3
+      ],
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "instrument": "violin",
+      "tracks": [
+        4
+      ],
+      "volume": 0.4,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "instrument": "violin",
+      "tracks": [
+        5
+      ],
+      "volume": 0.2,
+      "pan": -0.1,
+      "effects": []
+    },
+    {
+      "instrument": "violin",
+      "tracks": [
+        6
+      ],
+      "volume": 0.2,
+      "pan": 0.1,
+      "effects": []
+    },
+    {
+      "instrument": "flute",
+      "tracks": [
+        7,
+        16
+      ],
+      "volume": 0.2,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "instrument": "kick drum",
+      "tracks": [
+        11
+      ],
+      "notes": [
+        35,
+        36
+      ],
+      "volume": 0.3,
+      "pan": 0.1,
+      "effects": []
+    },
+    {
+      "instrument": "shaker",
+      "tracks": [
+        11
+      ],
+      "notes": [
+        42,
+        44,
+        46
+      ],
+      "volume": 0.3,
+      "pan": 0.0,
+      "effects": []
+    },
+    {
+      "instrument": "snare drum",
+      "tracks": [
+        11
+      ],
+      "notes": [
+        38,
+        40
+      ],
+      "volume": 0.3,
+      "pan": -0.1,
+      "effects": []
+    }
+  ]
+}
