@@ -36,7 +36,9 @@
     "waves": [
       {
         "type": "soft square",
-        "amplitude": 0.2,
+        "settings": {
+          "amplitude": 0.2
+        },
         "freqFactor": 0.0,
         "freqOffset": 196.0,
         "envelopes": [
@@ -45,7 +47,9 @@
       },
       {
         "type": "soft square",
-        "amplitude": 0.2,
+        "settings": {
+          "amplitude": 0.2
+        },
         "freqFactor": 0.0,
         "freqOffset": 294.0,
         "envelopes": [
@@ -54,7 +58,9 @@
       },
       {
         "type": "sine",
-        "amplitude": 0.4,
+        "settings": {
+          "amplitude": 0.4
+        },
         "freqFactor": 0.0,
         "freqOffset": 392.0,
         "envelopes": [
@@ -63,9 +69,9 @@
       },
       {
         "type": "white noise",
-        "amplitude": 0.6,
-        "freqFactor": 0.0,
-        "freqOffset": 0.0,
+        "settings": {
+          "amplitude": 0.6
+        },
         "envelopes": [
           "env2"
         ]

@@ -22,9 +22,9 @@
     "waves": [
       {
         "type": "white noise",
-        "amplitude": 1.0,
-        "freqFactor": 0.0,
-        "freqOffset": 1000.0,
+        "settings": {
+          "amplitude": 1.0
+        },
         "envelopes": [
           "env1"
         ]

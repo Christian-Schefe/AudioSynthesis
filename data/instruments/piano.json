@@ -29,16 +29,20 @@
     "waves": [
       {
         "type": "sine",
-        "amplitude": 0.7,
-        "phase": 0.0,
+        "settings": {
+          "amplitude": 0.7,
+          "phase": 0.0
+        },
         "envelopes": [
           "adsr"
         ]
       },
       {
         "type": "sine",
-        "amplitude": 0.2,
-        "phase": 0.0,
+        "settings": {
+          "amplitude": 0.2,
+          "phase": 0.0
+        },
         "freqFactor": 2.0,
         "envelopes": [
           "adsr"
@@ -46,8 +50,10 @@
       },
       {
         "type": "soft saw",
-        "amplitude": 0.3,
-        "phase": 0.5,
+        "settings": {
+          "amplitude": 0.3,
+          "phase": 0.5
+        },
         "envelopes": [
           "adsr"
         ]

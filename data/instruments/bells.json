@@ -22,8 +22,10 @@
     "waves": [
       {
         "type": "sine",
-        "amplitude": 0.6,
-        "phase": 0.0,
+        "settings": {
+          "amplitude": 0.6,
+          "phase": 0.0
+        },
         "freqFactor": 1.0,
         "envelopes": [
           "env1"
@@ -31,8 +33,10 @@
       },
       {
         "type": "sine",
-        "amplitude": 0.2,
-        "phase": 0.0,
+        "settings": {
+          "amplitude": 0.2,
+          "phase": 0.0
+        },
         "freqFactor": 1.2,
         "envelopes": [
           "env1"
@@ -40,8 +44,10 @@
       },
       {
         "type": "sine",
-        "amplitude": 0.1,
-        "phase": 0.0,
+        "settings": {
+          "amplitude": 0.1,
+          "phase": 0.0
+        },
         "freqFactor": 1.5,
         "envelopes": [
           "env1"
@@ -49,8 +55,10 @@
       },
       {
         "type": "sine",
-        "amplitude": 0.4,
-        "phase": 0.0,
+        "settings": {
+          "amplitude": 0.4,
+          "phase": 0.0
+        },
         "freqFactor": 2.0,
         "envelopes": [
           "env1"

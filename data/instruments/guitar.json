@@ -28,17 +28,12 @@
     "vibrato": 0.0,
     "waves": [
       {
-        "type": "soft saw",
-        "amplitude": 0.5,
-        "phase": 0.5,
-        "envelopes": [
-          "adsr"
-        ]
-      },
-      {
-        "type": "sine",
-        "amplitude": 0.5,
-        "phase": 0.0,
+        "type": "fm",
+        "settings": {
+          "amplitude": 1.0,
+          "modulationIndex": 1,
+          "modulationFreqFactor": 1.5
+        },
         "envelopes": [
           "adsr"
         ]
@@ -46,20 +41,5 @@
     ]
   },
   "effects": [
-    {
-      "type": "distortion",
-      "params": {
-        "hardness": 2.0,
-        "mix": 1.0
-      }
-    },
-    {
-      "type": "highpass",
-      "params": {
-        "cutoff": 100.0,
-        "q": 1.0,
-        "mix": 0.2
-      }
-    }
   ]
 }

@@ -121,7 +121,7 @@ class KeyComponent(
 fun main() {
     val instruments = readInstruments()
 
-    val (synth, effects) = instruments["piano"] ?: error("Instrument not found")
+    val (synth, effects) = instruments["guitar"] ?: error("Instrument not found")
 
     val ctx = Context(0, 44100)
     val node = applyEffects(synth.buildNode(ctx.random), effects)

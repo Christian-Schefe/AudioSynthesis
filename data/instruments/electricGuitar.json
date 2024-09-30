@@ -1,23 +1,23 @@
 {
-  "name": "flute",
+  "name": "electric guitar",
   "synth": "simpleSynth",
   "envelopes": {
     "adsr": {
       "attack": [
         {
-          "duration": 0.05,
+          "duration": 0.01,
           "endValue": 1.0,
           "steepness": 1.0
         },
         {
-          "duration": 1.0,
-          "endValue": 0.9,
+          "duration": 1.5,
+          "endValue": 0.0,
           "steepness": 1.0
         }
       ],
       "release": [
         {
-          "duration": 0.2,
+          "duration": 0.3,
           "endValue": 0.0,
           "steepness": 1.0
         }
@@ -25,13 +25,13 @@
     }
   },
   "params": {
-    "vibrato": 0.01,
+    "vibrato": 0.0,
     "waves": [
       {
-        "type": "triangle",
+        "type": "soft saw",
         "settings": {
-          "amplitude": 0.7,
-          "phase": 0.0
+          "amplitude": 0.5,
+          "phase": 0.5
         },
         "envelopes": [
           "adsr"
@@ -40,7 +40,7 @@
       {
         "type": "sine",
         "settings": {
-          "amplitude": 0.3,
+          "amplitude": 0.5,
           "phase": 0.0
         },
         "envelopes": [
@@ -50,5 +50,20 @@
     ]
   },
   "effects": [
+    {
+      "type": "distortion",
+      "params": {
+        "hardness": 2.0,
+        "mix": 1.0
+      }
+    },
+    {
+      "type": "highpass",
+      "params": {
+        "cutoff": 100.0,
+        "q": 1.0,
+        "mix": 0.2
+      }
+    }
   ]
 }

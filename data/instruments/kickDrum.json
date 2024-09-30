@@ -36,7 +36,9 @@
     "waves": [
       {
         "type": "soft square",
-        "amplitude": 0.2,
+        "settings": {
+          "amplitude": 0.2
+        },
         "freqFactor": 0.0,
         "freqOffset": 49.0,
         "envelopes": [
@@ -45,7 +47,9 @@
       },
       {
         "type": "sine",
-        "amplitude": 0.7,
+        "settings": {
+          "amplitude": 0.7
+        },
         "freqFactor": 0.0,
         "freqOffset": 98.0,
         "envelopes": [
@@ -54,9 +58,9 @@
       },
       {
         "type": "white noise",
-        "amplitude": 0.1,
-        "freqFactor": 0.0,
-        "freqOffset": 49.0,
+        "settings": {
+          "amplitude": 0.1
+        },
         "envelopes": [
           "env2"
         ]

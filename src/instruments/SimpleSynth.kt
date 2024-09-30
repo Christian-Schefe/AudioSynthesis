@@ -9,24 +9,61 @@ interface Synth {
     fun buildAudio(song: Song, noteFilter: NoteFilter, random: Random): AudioNode
 }
 
-enum class WaveType(val id: String) {
-    SINE("sine"), SQUARE("square"), SAWTOOTH("saw"), TRIANGLE("triangle"), SOFT_SQUARE("soft square"), SOFT_SAWTOOTH("soft saw"), WHITE_NOISE(
-        "white noise"
-    ),
-    PINK_NOISE("pink noise"), BROWN_NOISE("brown noise")
+enum class SimpleWaveType(val id: String) {
+    SINE("sine"), SQUARE("square"), SAWTOOTH("saw"), TRIANGLE("triangle"), SOFT_SQUARE("soft square"), SOFT_SAWTOOTH("soft saw")
 }
 
-data class WaveData(
-    val type: WaveType,
-    val amplitude: Double,
-    val phase: Double,
-    val freqFactor: Double,
-    val freqOffset: Double,
-    val envelopes: List<EnvelopeNode>
+enum class NoiseType(val id: String) {
+    WHITE_NOISE("white noise"), PINK_NOISE("pink noise"), BROWN_NOISE("brown noise")
+}
+
+interface IWaveData {
+    fun buildOscillatorNode(phaseOffset: Double): AudioNode
+}
+
+data class SimpleWaveData(val type: SimpleWaveType, val amplitude: Double, val phase: Double) : IWaveData {
+    override fun buildOscillatorNode(phaseOffset: Double): AudioNode {
+        return when (type) {
+            SimpleWaveType.SINE -> OscillatorNode.sine(amplitude, phase + phaseOffset)
+            SimpleWaveType.SQUARE -> OscillatorNode.square(amplitude, phase + phaseOffset)
+            SimpleWaveType.SAWTOOTH -> OscillatorNode.saw(amplitude, phase + phaseOffset)
+            SimpleWaveType.TRIANGLE -> OscillatorNode.triangle(amplitude, phase + phaseOffset)
+            SimpleWaveType.SOFT_SQUARE -> OscillatorNode.softSquare(amplitude, phase + phaseOffset)
+            SimpleWaveType.SOFT_SAWTOOTH -> OscillatorNode.softSaw(amplitude, phase + phaseOffset)
+        }
+    }
+}
+
+data class NoiseWaveData(val type: NoiseType, val amplitude: Double) : IWaveData {
+    override fun buildOscillatorNode(phaseOffset: Double): AudioNode {
+        return when (type) {
+            NoiseType.WHITE_NOISE -> IgnoreInputsNode(1, NoiseNode(amplitude))
+            NoiseType.PINK_NOISE -> Pipeline(listOf(SinkNode(1), NoiseNode(amplitude), PinkingFilter()))
+            NoiseType.BROWN_NOISE -> Pipeline(
+                listOf(
+                    SinkNode(1), NoiseNode(amplitude), PinkingFilter(), PinkingFilter()
+                )
+            )
+        }
+    }
+}
+
+data class FMWaveData(
+    val amplitude: Double, val modulationIndex: Double, val modulationFreqFactor: Double
+) : IWaveData {
+    override fun buildOscillatorNode(phaseOffset: Double): AudioNode {
+        return PartialApplicationNode(
+            ModulatedOscillatorNode.fm(amplitude, modulationIndex), mapOf(1 to modulationFreqFactor)
+        )
+    }
+}
+
+data class WaveComponent(
+    val data: IWaveData, val freqFactor: Double, val freqOffset: Double, val envelopes: List<EnvelopeNode>
 )
 
 class SimpleSynth(
-    private val vibrato: Double, private val mix: List<WaveData>
+    private val vibrato: Double, private val mix: List<WaveComponent>
 ) : Synth {
     override fun buildNode(random: Random): AudioNode {
         val vibratoFreq = random.nextDouble(4.0, 5.0)
@@ -47,24 +84,14 @@ class SimpleSynth(
         return instrumentPlayer
     }
 
-    class WaveNode(private val phaseOffset: Double, private val data: WaveData) : AudioNode(3, 2) {
+    class WaveNode(private val phaseOffset: Double, private val component: WaveComponent) : AudioNode(3, 2) {
 
-        private val envelopeNodes = data.envelopes.map { it.clone() }
+        private val envelopeNodes = component.envelopes.map { it.clone() }
 
-        private val oscillatorNode = when (data.type) {
-            WaveType.SINE -> OscillatorNode.sine(data.amplitude, phaseOffset + data.phase)
-            WaveType.SQUARE -> OscillatorNode.square(data.amplitude, phaseOffset + data.phase)
-            WaveType.SAWTOOTH -> OscillatorNode.saw(data.amplitude, phaseOffset + data.phase)
-            WaveType.TRIANGLE -> OscillatorNode.triangle(data.amplitude, phaseOffset + data.phase)
-            WaveType.SOFT_SQUARE -> OscillatorNode.softSquare(data.amplitude, phaseOffset + data.phase)
-            WaveType.SOFT_SAWTOOTH -> OscillatorNode.softSaw(data.amplitude, phaseOffset + data.phase)
-            WaveType.WHITE_NOISE -> IgnoreInputsNode(1, NoiseNode())
-            WaveType.PINK_NOISE -> Pipeline(listOf(SinkNode(1), NoiseNode(), PinkingFilter()))
-            WaveType.BROWN_NOISE -> Pipeline(listOf(SinkNode(1), NoiseNode(), PinkingFilter(), PinkingFilter()))
-        }
+        private val oscillatorNode = component.data.buildOscillatorNode(phaseOffset)
 
         override fun process(ctx: Context, inputs: DoubleArray): DoubleArray {
-            val freq = inputs[0] * data.freqFactor + data.freqOffset
+            val freq = inputs[0] * component.freqFactor + component.freqOffset
             val noteOn = inputs[1]
             val velocity = inputs[2]
 
@@ -75,7 +102,7 @@ class SimpleSynth(
         }
 
         override fun clone(): AudioNode {
-            return WaveNode(phaseOffset, data)
+            return WaveNode(phaseOffset, component)
         }
 
         override fun reset() {
@@ -97,7 +124,7 @@ class SimpleSynth(
         private val vibratoFreq: Double,
         private val phaseOffset: Double,
         private val vibrato: Double,
-        private val mix: List<WaveData>
+        private val mix: List<WaveComponent>
     ) : AudioNode(4, 2) {
         private val vibratoNode = VibratoNode(1.0, vibrato, vibratoFreq)
 

@@ -26,7 +26,7 @@ class SinkNode(inputCount: Int) : AudioNode(inputCount, 0) {
     override fun clone(): AudioNode = SinkNode(inputCount)
 }
 
-class IgnoreInputsNode(inputCount: Int, val node: AudioNode) : AudioNode(inputCount, node.outputCount) {
+class IgnoreInputsNode(inputCount: Int, private val node: AudioNode) : AudioNode(inputCount, node.outputCount) {
     init {
         require(node.inputCount == 0)
     }
@@ -52,4 +52,35 @@ class ConstantNode(private vararg val values: Double) : AudioNode(0, values.size
     }
 
     override fun clone(): AudioNode = ConstantNode(*values)
+}
+
+class PartialApplicationNode(private val node: AudioNode, private val inputs: Map<Int, Double>) :
+    AudioNode(node.inputCount - inputs.size, node.outputCount) {
+    init {
+        inputs.keys.forEach { require(it in 0..<node.inputCount) { "Invalid index: $it of ${node.inputCount}" } }
+    }
+
+    override fun process(ctx: Context, inputs: DoubleArray): DoubleArray {
+        var inputPointer = 0
+        val actualInputs = DoubleArray(node.inputCount) {
+            if (it in this.inputs) {
+                this.inputs[it]!!
+            } else {
+                val value = inputs[inputPointer]
+                inputPointer++
+                value
+            }
+        }
+        return node.process(ctx, actualInputs)
+    }
+
+    override fun clone(): AudioNode = PartialApplicationNode(node.clone(), inputs)
+
+    override fun init(ctx: Context) {
+        node.init(ctx)
+    }
+
+    override fun reset() {
+        node.reset()
+    }
 }
