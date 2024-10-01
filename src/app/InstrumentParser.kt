@@ -12,13 +12,15 @@ fun readInstrumentFiles(folder: String): List<String> {
     for (file in dir.listFiles()!!) {
         if (file.isFile && file.extension == "json") {
             files.add(file.absolutePath)
+        } else if (file.isDirectory) {
+            files.addAll(readInstrumentFiles(file.absolutePath))
         }
     }
-    return files.map { FileInputStream(it).readAllBytes().decodeToString() }
+    return files
 }
 
 fun readInstruments(): Map<String, Pair<Synth, List<Effect>>> {
-    val json = readInstrumentFiles("data/instruments")
+    val json = readInstrumentFiles("data/instruments").map { FileInputStream(it).readAllBytes().decodeToString() }
     val schema = ObjectSchema(
         "name" to StringSchema() to false,
         "envelopes" to AnySchema() to false,

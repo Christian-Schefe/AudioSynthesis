@@ -1,5 +1,5 @@
 {
-  "name": "violin",
+  "name": "cello",
   "synth": "simpleSynth",
   "envelopes": {
     "adsr": {
@@ -28,32 +28,22 @@
     "vibrato": 0.008,
     "waves": [
       {
+        "type": "sine",
+        "settings": {
+          "amplitude": 0.5,
+          "phase": 0.0
+        },
+        "envelopes": [
+          "adsr"
+        ]
+      },
+      {
         "type": "soft saw",
         "settings": {
-          "amplitude": 0.6,
+          "amplitude": 0.5,
           "phase": 0.0
         },
-        "envelopes": [
-          "adsr"
-        ]
-      },
-      {
-        "type": "saw",
-        "settings": {
-          "amplitude": 0.1,
-          "phase": 0.0
-        },
-        "freqFactor": 2.0,
-        "envelopes": [
-          "adsr"
-        ]
-      },
-      {
-        "type": "soft square",
-        "settings": {
-          "amplitude": 0.3,
-          "phase": 0.75
-        },
+        "freqFactor": 1.0,
         "envelopes": [
           "adsr"
         ]
@@ -70,11 +60,13 @@
       }
     },
     {
-      "type": "highpass",
+      "type": "chorus",
       "params": {
-        "cutoff": 100.0,
-        "mix": 0.4,
-        "q": 0.7
+        "voiceCount": 5,
+        "separation": 0.015,
+        "variance": 0.005,
+        "modulationSpeed": 0.5,
+        "mix": 0.2
       }
     }
   ]

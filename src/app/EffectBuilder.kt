@@ -59,6 +59,23 @@ fun buildEffect(type: String, params: JsonElement): Effect {
             return GainEffect(gain)
         }
 
+        "chorus" -> {
+            val schema = ObjectSchema(
+                "voiceCount" to NumberSchema() to false,
+                "separation" to NumberSchema() to false,
+                "variance" to NumberSchema() to false,
+                "modulationSpeed" to NumberSchema() to false,
+                "mix" to NumberSchema() to true
+            )
+            val parsed = schema.safeConvert(params).throwIfErr()
+            val voiceCount = parsed["voiceCount"]!!.num().value.toInt()
+            val separation = parsed["separation"]!!.num().value.toDouble()
+            val variance = parsed["variance"]!!.num().value.toDouble()
+            val modulationSpeed = parsed["modulationSpeed"]!!.num().value.toDouble()
+            val mix = parsed["mix"]?.num()?.value?.toDouble() ?: 1.0
+            return ChorusEffect(voiceCount, separation, variance, modulationSpeed, mix)
+        }
+
         else -> throw IllegalArgumentException("Unknown effect type: $type")
     }
 }

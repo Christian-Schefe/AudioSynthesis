@@ -118,10 +118,16 @@ class KeyComponent(
     }
 }
 
+fun askForInstrument(): String {
+    println("Enter instrument name:")
+    return readlnOrNull() ?: error("No input")
+}
+
 fun main() {
     val instruments = readInstruments()
 
-    val (synth, effects) = instruments["guitar"] ?: error("Instrument not found")
+    val instrumentName = askForInstrument()
+    val (synth, effects) = instruments[instrumentName] ?: error("Instrument not found")
 
     val ctx = Context(0, 44100)
     val node = applyEffects(synth.buildNode(ctx.random), effects)

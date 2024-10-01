@@ -30,7 +30,17 @@
       {
         "type": "triangle",
         "settings": {
-          "amplitude": 0.7,
+          "amplitude": 0.5,
+          "phase": 0.0
+        },
+        "envelopes": [
+          "adsr"
+        ]
+      },
+      {
+        "type": "soft saw",
+        "settings": {
+          "amplitude": 0.2,
           "phase": 0.0
         },
         "envelopes": [
@@ -50,5 +60,15 @@
     ]
   },
   "effects": [
+    {
+      "type": "chorus",
+      "params": {
+        "voiceCount": 5,
+        "separation": 0.015,
+        "variance": 0.005,
+        "modulationSpeed": 0.5,
+        "mix": 0.3
+      }
+    }
   ]
 }

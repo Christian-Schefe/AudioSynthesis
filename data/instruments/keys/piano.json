@@ -10,8 +10,8 @@
           "steepness": 1.0
         },
         {
-          "duration": 1.0,
-          "endValue": 0.1,
+          "duration": 1.5,
+          "endValue": 0.0,
           "steepness": 1.0
         }
       ],
@@ -67,6 +67,16 @@
         "cutoff": 2000.0,
         "mix": 0.7,
         "q": 1.0
+      }
+    },
+    {
+      "type": "chorus",
+      "params": {
+        "voiceCount": 5,
+        "separation": 0.015,
+        "variance": 0.005,
+        "modulationSpeed": 0.5,
+        "mix": 0.2
       }
     }
   ]

@@ -64,3 +64,19 @@ class GainEffect(
         }
     }
 }
+
+class ChorusEffect(
+    private val voiceCount: Int,
+    private val separation: Double,
+    private val variance: Double,
+    private val modulationSpeed: Double,
+    private val mix: Double = 1.0
+) : Effect {
+    override fun buildNode(): AudioNode {
+        return StereoMixNode(
+            ChorusNode(0, voiceCount, separation, variance, modulationSpeed) to ChorusNode(
+                1, voiceCount, separation, variance, modulationSpeed
+            ), mix
+        )
+    }
+}
