@@ -2,6 +2,7 @@ package gui
 
 import app.applyEffects
 import app.readInstruments
+import effects.Effect
 import nodes.*
 import playback.AudioPlayer
 import java.awt.Graphics
@@ -12,7 +13,7 @@ import javax.swing.JPanel
 import kotlin.concurrent.thread
 import kotlin.math.pow
 
-class InteractivePlayer(val ctx: Context, node: AudioNode) : JFrame() {
+class InteractivePlayer(val ctx: Context, node: AudioNode, effects: List<Effect>) : JFrame() {
     private val keyComponents = mutableListOf<KeyComponent>()
     private val settingsNodes = mutableListOf<SettingsNode>()
     private var octave = 0
@@ -21,32 +22,37 @@ class InteractivePlayer(val ctx: Context, node: AudioNode) : JFrame() {
         title = "Interactive Player"
         defaultCloseOperation = EXIT_ON_CLOSE
         layout = null
-        setSize(1000, 600)
+        setSize(1200, 400)
         setLocationRelativeTo(null)
 
         addKeyListener(object : KeyAdapter() {
             override fun keyPressed(e: KeyEvent) {
-                keyDown(e.keyCode)
+                keyDown(e.keyCode, e.keyChar)
             }
 
             override fun keyReleased(e: KeyEvent) {
-                keyUp(e.keyCode)
+                keyUp(e.keyChar)
             }
         })
 
         val keys = listOf(
-            KeyEvent.VK_A to (0 to 0),
-            KeyEvent.VK_W to (0 to 1),
-            KeyEvent.VK_S to (1 to 0),
-            KeyEvent.VK_E to (1 to 1),
-            KeyEvent.VK_D to (2 to 0),
-            KeyEvent.VK_F to (3 to 0),
-            KeyEvent.VK_T to (3 to 1),
-            KeyEvent.VK_G to (4 to 0),
-            KeyEvent.VK_Z to (4 to 1),
-            KeyEvent.VK_H to (5 to 0),
-            KeyEvent.VK_U to (5 to 1),
-            KeyEvent.VK_J to (6 to 0),
+            'a' to (0 to 0),
+            'w' to (0 to 1),
+            's' to (1 to 0),
+            'e' to (1 to 1),
+            'd' to (2 to 0),
+            'f' to (3 to 0),
+            't' to (3 to 1),
+            'g' to (4 to 0),
+            'z' to (4 to 1),
+            'h' to (5 to 0),
+            'u' to (5 to 1),
+            'j' to (6 to 0),
+            'k' to (7 to 0),
+            'o' to (7 to 1),
+            'l' to (8 to 0),
+            'p' to (8 to 1),
+            'ö' to (9 to 0),
         )
 
         keys.forEachIndexed { index, key ->
@@ -63,23 +69,24 @@ class InteractivePlayer(val ctx: Context, node: AudioNode) : JFrame() {
         val fullNodes = settingsNodes.map { Pipeline(listOf(it, node.clone())) }
         val mixer = MixerNode()
         fullNodes.forEach { mixer.addNode(it, 1.0, 0.0) }
+        val effectAppliedNode = applyEffects(mixer, effects)
 
         thread {
             val player = AudioPlayer()
-            player.renderAndPlay(mixer, ctx, 1000.0)
+            player.renderAndPlay(effectAppliedNode, ctx, 1000.0)
         }
     }
 
-    fun keyDown(key: Int) {
+    fun keyDown(code: Int, key: Char) {
         keyComponents.forEach { it.setPressed(key, true) }
-        if (key == KeyEvent.VK_UP) {
+        if (code == KeyEvent.VK_UP) {
             octave++
-        } else if (key == KeyEvent.VK_DOWN) {
+        } else if (code == KeyEvent.VK_DOWN) {
             octave--
         }
     }
 
-    fun keyUp(key: Int) {
+    fun keyUp(key: Char) {
         keyComponents.forEach { it.setPressed(key, false) }
     }
 
@@ -89,11 +96,11 @@ class InteractivePlayer(val ctx: Context, node: AudioNode) : JFrame() {
 }
 
 class KeyComponent(
-    private val key: Int, index: Pair<Int, Int>, private val onPressed: (Boolean) -> Unit
+    private val key: Char, index: Pair<Int, Int>, private val onPressed: (Boolean) -> Unit
 ) : JPanel() {
     private var isPressed = false
-    private val x = 100 * index.first + 50 * index.second + 25
-    private val y = 100 * (1 - index.second) + 25
+    private val x = 100 * index.first + 50 * index.second + 85
+    private val y = 100 * (1 - index.second) + 80
 
     init {
         setSize(100, 100)
@@ -110,7 +117,7 @@ class KeyComponent(
         }
     }
 
-    fun setPressed(key: Int, pressed: Boolean) {
+    fun setPressed(key: Char, pressed: Boolean) {
         if (key != this.key) return
         isPressed = pressed
         onPressed(isPressed)
@@ -130,8 +137,8 @@ fun main() {
     val (synth, effects) = instruments[instrumentName] ?: error("Instrument not found")
 
     val ctx = Context(0, 44100)
-    val node = applyEffects(synth.buildNode(ctx.random), effects)
+    val node = synth.buildNode(ctx.random)
 
-    val player = InteractivePlayer(ctx, node)
+    val player = InteractivePlayer(ctx, node, effects)
     player.isVisible = true
 }
