@@ -1,7 +1,7 @@
 package instruments
 
-import nodes.AudioNode
-import nodes.Context
+import node.AudioNode
+import node.Context
 import kotlin.math.pow
 
 class ShapeEnvelope(val shape: Shape) : EnvelopeNode() {
@@ -30,7 +30,7 @@ class ShapeEnvelope(val shape: Shape) : EnvelopeNode() {
         return value
     }
 
-    override fun clone(): AudioNode {
+    override fun cloneSettings(): AudioNode {
         return ShapeEnvelope(shape.copy())
     }
 
@@ -66,12 +66,12 @@ class ControlledShapeEnvelope(attackShape: Shape, releaseShape: Shape?) : Envelo
         return value
     }
 
-    override fun clone(): AudioNode {
+    override fun cloneSettings(): AudioNode {
         val clone = ControlledShapeEnvelope(attackEnvelope.shape, releaseEnvelope?.shape)
         clone.prevGate = prevGate
-        clone.attackEnvelope = attackEnvelope.clone() as ShapeEnvelope
-        clone.releaseEnvelope = releaseEnvelope?.clone() as ShapeEnvelope?
-        clone.envelope = envelope?.clone() as ShapeEnvelope?
+        clone.attackEnvelope = attackEnvelope.cloneSettings() as ShapeEnvelope
+        clone.releaseEnvelope = releaseEnvelope?.cloneSettings() as ShapeEnvelope?
+        clone.envelope = envelope?.cloneSettings() as ShapeEnvelope?
         clone.timeOffset = timeOffset
         return clone
     }

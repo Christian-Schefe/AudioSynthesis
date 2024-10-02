@@ -1,6 +1,15 @@
 package instruments
 
-import nodes.*
+import node.*
+import node.composite.IgnoreInputsNode
+import node.composite.PartialApplicationNode
+import node.composite.Pipeline
+import node.composite.SinkNode
+import node.filter.PinkingFilter
+import node.oscillator.FrequencyModulatorNode
+import node.oscillator.NoiseNode
+import node.oscillator.OscillatorNode
+import node.oscillator.PulseWidthModulatorNode
 
 
 enum class SimpleWaveType(val id: String) {

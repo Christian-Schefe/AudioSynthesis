@@ -1,11 +1,11 @@
-package nodes
+package node
 
 class SettingsNode(private var settings: DoubleArray) : AudioNode(0, settings.size) {
     override fun process(ctx: Context, inputs: DoubleArray): DoubleArray {
         return settings
     }
 
-    override fun clone(): AudioNode {
+    override fun cloneSettings(): AudioNode {
         return SettingsNode(settings)
     }
 

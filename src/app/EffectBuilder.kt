@@ -1,8 +1,10 @@
 package app
 
 import effects.*
-import nodes.AudioNode
-import nodes.Pipeline
+import node.AudioNode
+import node.composite.Pipeline
+import node.filter.SvfFilter
+import node.filter.SvfFilterType
 import util.json.*
 
 
@@ -74,6 +76,53 @@ fun buildEffect(type: String, params: JsonElement): Effect {
             val modulationSpeed = parsed["modulationSpeed"]!!.num().value.toDouble()
             val mix = parsed["mix"]?.num()?.value?.toDouble() ?: 1.0
             return ChorusEffect(voiceCount, separation, variance, modulationSpeed, mix)
+        }
+
+        "svf" -> {
+            val noGainFilterIds = SvfFilterType.entries.filter { !it.hasGain }.map { it.id }.toTypedArray()
+            val gainFilterIds = SvfFilterType.entries.filter { it.hasGain }.map { it.id }.toTypedArray()
+
+            val noGainSchema = ObjectSchema(
+                "cutoff" to NumberSchema() to false,
+                "q" to NumberSchema() to false,
+                "type" to EnumSchema(noGainFilterIds) to false,
+                "mix" to NumberSchema() to true
+            )
+
+            val gainSchema = ObjectSchema(
+                "cutoff" to NumberSchema() to false,
+                "q" to NumberSchema() to false,
+                "type" to EnumSchema(gainFilterIds) to false,
+                "gain" to NumberSchema() to false,
+                "mix" to NumberSchema() to true
+            )
+
+            val schema = UnionSchema(noGainSchema, gainSchema)
+
+            val parsed = schema.safeConvert(params).throwIfErr().union()
+            val data = parsed.data
+
+            val cutoff = data["cutoff"]!!.num().value.toDouble()
+            val q = data["q"]!!.num().value.toDouble()
+            val typeStr = (data["type"]!!.enum().value as JsonString).value
+            val mix = data["mix"]?.num()?.value?.toDouble() ?: 1.0
+
+            val gain = if (parsed.id == 1) {
+                parsed["gain"]!!.num().value.toDouble()
+            } else null
+
+            val svfType = SvfFilterType.entries.find { it.id == typeStr }
+                ?: throw IllegalArgumentException("Unknown filter type: $typeStr")
+            if (svfType.hasGain && gain == null) {
+                throw IllegalArgumentException("Filter type $typeStr requires gain")
+            }
+
+            val filter = SvfFilter.fromType(svfType, cutoff, q, gain)
+            return Effect {
+                StereoMixNode(
+                    filter to filter.cloneSettings(), mix
+                )
+            }
         }
 
         else -> throw IllegalArgumentException("Unknown effect type: $type")

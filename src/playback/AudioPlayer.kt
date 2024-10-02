@@ -1,6 +1,7 @@
 package playback
 
-import nodes.*
+import node.*
+import node.composite.Pipeline
 import util.bytes.ByteConverter
 import util.bytes.Endianness
 import wav.WavFile

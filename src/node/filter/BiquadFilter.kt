@@ -1,5 +1,7 @@
-package nodes
+package node.filter
 
+import node.AudioNode
+import node.Context
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
@@ -96,7 +98,7 @@ class BiquadFilter(val coefficientFactory: (Double) -> BiquadCoefficients) : Aud
         y2 = 0.0
     }
 
-    override fun clone(): AudioNode {
+    override fun cloneSettings(): AudioNode {
         return BiquadFilter(coefficientFactory)
     }
 

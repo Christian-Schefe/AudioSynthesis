@@ -30,7 +30,7 @@
       {
         "type": "pwm",
         "settings": {
-          "amplitude": 0.1,
+          "amplitude": 0.14,
           "modulationAmount": 0.01,
           "modulationFreq": 50,
           "modulatorShape": "triangle"
@@ -42,7 +42,7 @@
       {
         "type": "soft saw",
         "settings": {
-          "amplitude": 0.3
+          "amplitude": 0.43
         },
         "envelopes": [
           "adsr"
@@ -51,7 +51,7 @@
       {
         "type": "soft saw",
         "settings": {
-          "amplitude": 0.3
+          "amplitude": 0.43
         },
         "freqFactor": 0.995,
         "envelopes": [

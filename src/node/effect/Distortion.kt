@@ -1,5 +1,7 @@
-package nodes
+package node.effect
 
+import node.AudioNode
+import node.Context
 import kotlin.math.abs
 
 class Distortion(val shape: (Double) -> Double) : AudioNode(1, 1) {
@@ -7,7 +9,7 @@ class Distortion(val shape: (Double) -> Double) : AudioNode(1, 1) {
         return doubleArrayOf(shape(inputs[0]))
     }
 
-    override fun clone(): AudioNode {
+    override fun cloneSettings(): AudioNode {
         return Distortion(shape)
     }
 

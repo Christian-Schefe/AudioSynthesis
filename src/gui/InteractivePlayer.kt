@@ -3,7 +3,8 @@ package gui
 import app.applyEffects
 import app.readInstruments
 import effects.Effect
-import nodes.*
+import node.*
+import node.composite.Pipeline
 import playback.AudioPlayer
 import java.awt.Graphics
 import java.awt.event.KeyAdapter
@@ -27,11 +28,11 @@ class InteractivePlayer(val ctx: Context, node: AudioNode, effects: List<Effect>
 
         addKeyListener(object : KeyAdapter() {
             override fun keyPressed(e: KeyEvent) {
-                keyDown(e.keyCode, e.keyChar)
+                keyDown(e.keyCode, e.keyChar.lowercaseChar())
             }
 
             override fun keyReleased(e: KeyEvent) {
-                keyUp(e.keyChar)
+                keyUp(e.keyChar.lowercaseChar())
             }
         })
 
@@ -66,10 +67,11 @@ class InteractivePlayer(val ctx: Context, node: AudioNode, effects: List<Effect>
             add(component)
         }
 
-        val fullNodes = settingsNodes.map { Pipeline(listOf(it, node.clone())) }
+        val fullNodes = settingsNodes.map { Pipeline(listOf(it, node.cloneSettings())) }
         val mixer = MixerNode()
         fullNodes.forEach { mixer.addNode(it, 1.0, 0.0) }
         val effectAppliedNode = applyEffects(mixer, effects)
+
 
         thread {
             val player = AudioPlayer()

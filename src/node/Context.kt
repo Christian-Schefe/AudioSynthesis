@@ -1,4 +1,4 @@
-package nodes
+package node
 
 import kotlin.random.Random
 

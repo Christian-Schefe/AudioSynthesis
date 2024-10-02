@@ -224,7 +224,8 @@ class ArraySchema(private val schema: JsonSchema) : JsonSchema() {
 
 class EnumSchema(private val values: List<JsonElement>) : JsonSchema() {
     constructor(vararg values: JsonElement) : this(values.toList())
-    constructor(vararg values: String) : this(values.map { JsonString(it) })
+    constructor(values: Array<String>) : this(values.map { JsonString(it) })
+
 
     override fun validateInternal(path: MutableList<String>, json: JsonElement): ValidationError? {
         val index = values.indexOfFirst { it.contentEquals(json) }
@@ -234,15 +235,19 @@ class EnumSchema(private val values: List<JsonElement>) : JsonSchema() {
     }
 
     override fun convertInternal(json: JsonElement): SchemaData {
-        return EnumData(values.indexOfFirst { it.contentEquals(json) })
+        val index = values.indexOfFirst { it.contentEquals(json) }
+        return EnumData(index, values[index])
     }
 
-    data class EnumData(val id: Int) : SchemaData()
+    data class EnumData(val id: Int, val value: JsonElement) : SchemaData()
 }
 
-class StringSchema : JsonSchema() {
+class StringSchema(val value: String? = null) : JsonSchema() {
     override fun validateInternal(path: MutableList<String>, json: JsonElement): ValidationError? {
-        return if (json is JsonString) null else ValidationError(path.toTypedArray(), "Expected string")
+        return if (json is JsonString) {
+            if (value != null && json.value != value) ValidationError(path.toTypedArray(), "Expected string $value")
+            else null
+        } else ValidationError(path.toTypedArray(), "Expected string")
     }
 
     override fun convertInternal(json: JsonElement): SchemaData {
@@ -311,7 +316,12 @@ class UnionSchema(private val schemas: List<JsonSchema>) : JsonSchema() {
 
     override fun validateInternal(path: MutableList<String>, json: JsonElement): ValidationError? {
         val index = schemas.indexOfFirst { it.isValid(json) }
-        return if (index == -1) ValidationError(path.toTypedArray(), "JSON element does not match any schema") else null
+        if (index != -1) return null
+        val errors = schemas.mapIndexed { i, schema ->
+            val err = schema.validateInternal(path, json)
+            if (err != null) "Schema $i: $err" else null
+        }.filterNotNull()
+        return ValidationError(path.toTypedArray(), "JSON element does not match any schema: $errors")
     }
 
     override fun convertInternal(json: JsonElement): SchemaData {

@@ -1,6 +1,7 @@
 package instruments
 
-import nodes.*
+import node.*
+import node.effect.VibratoNode
 import song.Song
 import kotlin.random.Random
 
@@ -33,7 +34,7 @@ class SimpleSynth(
 
     class WaveNode(private val phaseOffset: Double, private val component: WaveComponent) : AudioNode(3, 2) {
 
-        private val envelopeNodes = component.envelopes.map { it.clone() }
+        private val envelopeNodes = component.envelopes.map { it.cloneSettings() }
 
         private val oscillatorNode = component.data.buildOscillatorNode(phaseOffset)
 
@@ -48,7 +49,7 @@ class SimpleSynth(
             return doubleArrayOf(output, output)
         }
 
-        override fun clone(): AudioNode {
+        override fun cloneSettings(): AudioNode {
             return WaveNode(phaseOffset, component)
         }
 
@@ -92,7 +93,7 @@ class SimpleSynth(
             return output
         }
 
-        override fun clone(): AudioNode {
+        override fun cloneSettings(): AudioNode {
             return SynthNode(vibratoFreq, phaseOffset, vibrato, mix)
         }
 

@@ -1,4 +1,7 @@
-package nodes
+package node.composite
+
+import node.AudioNode
+import node.Context
 
 
 class CustomNode(inputCount: Int, outputCount: Int, private val mapper: (DoubleArray) -> DoubleArray) :
@@ -7,7 +10,7 @@ class CustomNode(inputCount: Int, outputCount: Int, private val mapper: (DoubleA
         return mapper(inputs)
     }
 
-    override fun clone(): AudioNode = CustomNode(inputCount, outputCount, mapper)
+    override fun cloneSettings(): AudioNode = CustomNode(inputCount, outputCount, mapper)
 }
 
 class PassNode(inputCount: Int) : AudioNode(inputCount, inputCount) {
@@ -15,7 +18,7 @@ class PassNode(inputCount: Int) : AudioNode(inputCount, inputCount) {
         return inputs
     }
 
-    override fun clone(): AudioNode = PassNode(inputCount)
+    override fun cloneSettings(): AudioNode = PassNode(inputCount)
 }
 
 class SinkNode(inputCount: Int) : AudioNode(inputCount, 0) {
@@ -23,7 +26,7 @@ class SinkNode(inputCount: Int) : AudioNode(inputCount, 0) {
         return doubleArrayOf()
     }
 
-    override fun clone(): AudioNode = SinkNode(inputCount)
+    override fun cloneSettings(): AudioNode = SinkNode(inputCount)
 }
 
 class IgnoreInputsNode(inputCount: Int, private val node: AudioNode) : AudioNode(inputCount, node.outputCount) {
@@ -35,7 +38,7 @@ class IgnoreInputsNode(inputCount: Int, private val node: AudioNode) : AudioNode
         return node.process(ctx, inputs)
     }
 
-    override fun clone(): AudioNode = IgnoreInputsNode(inputCount, node.clone())
+    override fun cloneSettings(): AudioNode = IgnoreInputsNode(inputCount, node.cloneSettings())
 
     override fun init(ctx: Context) {
         node.init(ctx)
@@ -51,7 +54,7 @@ class ConstantNode(private vararg val values: Double) : AudioNode(0, values.size
         return values
     }
 
-    override fun clone(): AudioNode = ConstantNode(*values)
+    override fun cloneSettings(): AudioNode = ConstantNode(*values)
 }
 
 class PartialApplicationNode(private val node: AudioNode, private val inputs: Map<Int, Double>) :
@@ -74,7 +77,7 @@ class PartialApplicationNode(private val node: AudioNode, private val inputs: Ma
         return node.process(ctx, actualInputs)
     }
 
-    override fun clone(): AudioNode = PartialApplicationNode(node.clone(), inputs)
+    override fun cloneSettings(): AudioNode = PartialApplicationNode(node.cloneSettings(), inputs)
 
     override fun init(ctx: Context) {
         node.init(ctx)

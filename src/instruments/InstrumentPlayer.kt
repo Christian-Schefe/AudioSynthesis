@@ -1,7 +1,7 @@
 package instruments
 
-import nodes.AudioNode
-import nodes.Context
+import node.AudioNode
+import node.Context
 import song.Song
 import kotlin.math.pow
 import kotlin.random.Random
@@ -130,7 +130,7 @@ class InstrumentPlayer(
         voices.forEach { it.reset() }
     }
 
-    override fun clone(): AudioNode {
+    override fun cloneSettings(): AudioNode {
         return InstrumentPlayer(soundFactory, random, song, noteFilter, voices.size, releaseTimeEvaluator)
     }
 

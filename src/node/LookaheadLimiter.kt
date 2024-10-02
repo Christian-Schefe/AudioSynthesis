@@ -1,4 +1,4 @@
-package nodes
+package node
 
 import kotlin.math.abs
 import kotlin.math.min
@@ -54,7 +54,7 @@ class LookaheadLimiter(
         reset()
     }
 
-    override fun clone(): AudioNode {
+    override fun cloneSettings(): AudioNode {
         return LookaheadLimiter(inputCount, threshold, lookaheadTime, releaseTime)
     }
 

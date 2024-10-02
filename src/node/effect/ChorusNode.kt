@@ -1,5 +1,9 @@
-package nodes
+package node.effect
 
+import node.AudioNode
+import node.Context
+import node.ModulatedDelay
+import node.oscillator.SplineNoiseNode
 import kotlin.random.Random
 
 class ChorusNode(
@@ -25,10 +29,10 @@ class ChorusNode(
         return delay.process(ctx, inputArr)
     }
 
-    override fun clone(): AudioNode {
+    override fun cloneSettings(): AudioNode {
         val node = ChorusNode(seed, voiceCount, separation, variance, modulationSpeed)
-        node.voices = voices.map { it.clone() }
-        node.delay = delay.clone() as ModulatedDelay
+        node.voices = voices.map { it.cloneSettings() }
+        node.delay = delay.cloneSettings() as ModulatedDelay
         return node
     }
 

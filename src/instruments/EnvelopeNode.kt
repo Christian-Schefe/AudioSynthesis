@@ -1,7 +1,7 @@
 package instruments
 
-import nodes.AudioNode
-import nodes.Context
+import node.AudioNode
+import node.Context
 
 abstract class EnvelopeNode : AudioNode(1, 1) {
     private var time = 0.0

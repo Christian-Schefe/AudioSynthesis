@@ -1,5 +1,7 @@
-package nodes
+package node.oscillator
 
+import node.AudioNode
+import node.Context
 import kotlin.math.*
 
 
@@ -19,7 +21,7 @@ class OscillatorNode(
         phase = initialPhase
     }
 
-    override fun clone(): AudioNode {
+    override fun cloneSettings(): AudioNode {
         val cloned = OscillatorNode(oscillator, amplitude, initialPhase)
         cloned.phase = phase
         return cloned

@@ -1,5 +1,7 @@
-package nodes
+package node.oscillator
 
+import node.AudioNode
+import node.Context
 import kotlin.math.PI
 import kotlin.math.sin
 
@@ -30,7 +32,7 @@ class PulseWidthModulatorNode(
         modulationPhase = 0.0
     }
 
-    override fun clone(): AudioNode {
+    override fun cloneSettings(): AudioNode {
         val cloned = PulseWidthModulatorNode(modulationOscillator, modulationAmount, amplitude)
         cloned.carrierPhase = carrierPhase
         cloned.modulationPhase = modulationPhase

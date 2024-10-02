@@ -1,4 +1,7 @@
-package nodes
+package node.filter
+
+import node.AudioNode
+import node.Context
 
 class PinkingFilter : AudioNode(1, 1) {
     private var b0: Double = 0.0
@@ -35,7 +38,7 @@ class PinkingFilter : AudioNode(1, 1) {
         return doubleArrayOf(out)
     }
 
-    override fun clone(): AudioNode {
+    override fun cloneSettings(): AudioNode {
         return PinkingFilter()
     }
 }

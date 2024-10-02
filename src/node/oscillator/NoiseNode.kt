@@ -1,5 +1,7 @@
-package nodes
+package node.oscillator
 
+import node.AudioNode
+import node.Context
 import kotlin.random.Random
 
 class NoiseNode(val amplitude: Double = 1.0) : AudioNode(0, 1) {
@@ -9,7 +11,7 @@ class NoiseNode(val amplitude: Double = 1.0) : AudioNode(0, 1) {
         return doubleArrayOf((random.nextDouble() * 2 - 1) * amplitude)
     }
 
-    override fun clone(): AudioNode {
+    override fun cloneSettings(): AudioNode {
         return NoiseNode()
     }
 
@@ -41,7 +43,7 @@ class SplineNoiseNode(val seed: Int, val amplitude: Double = 1.0, val samplesPer
         return doubleArrayOf(value)
     }
 
-    override fun clone(): AudioNode {
+    override fun cloneSettings(): AudioNode {
         return SplineNoiseNode(seed, amplitude, samplesPerSecond)
     }
 

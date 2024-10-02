@@ -1,5 +1,8 @@
-package nodes
+package node.effect
 
+import node.AudioNode
+import node.Context
+import node.oscillator.OscillatorNode
 import kotlin.math.*
 
 class VibratoNode(private val fadeIn: Double, private val amount: Double, private val frequency: Double) : AudioNode(1, 1) {
@@ -16,10 +19,10 @@ class VibratoNode(private val fadeIn: Double, private val amount: Double, privat
         return doubleArrayOf(result * inputs[0])
     }
 
-    override fun clone(): AudioNode {
+    override fun cloneSettings(): AudioNode {
         val clone = VibratoNode(fadeIn, amount, frequency)
         clone.time = time
-        clone.oscillatorNode = oscillatorNode.clone()
+        clone.oscillatorNode = oscillatorNode.cloneSettings()
         return clone
     }
 

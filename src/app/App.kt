@@ -1,13 +1,12 @@
 package app
 
-import nodes.MixerNode
-import nodes.*
+import node.MixerNode
+import node.*
 import playback.AudioPlayer
 import song.Song
 import wav.*
 import java.io.FileInputStream
 import kotlin.concurrent.thread
-import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.measureTimedValue
 import kotlin.time.toDuration
@@ -22,7 +21,7 @@ fun app() {
     val json = FileInputStream(path).readAllBytes().decodeToString()
     val (song, mixer) = parse(ctx, json)
 
-    val mixerClone = mixer.clone()
+    val mixerClone = mixer.cloneSettings()
     val ctxClone = ctx.clone()
     val playDuration = song.duration() + 2
 

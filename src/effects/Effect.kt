@@ -1,9 +1,13 @@
 package effects
 
-import nodes.*
-import nodes.Distortion
+import node.*
+import node.composite.CustomNode
+import node.effect.ChorusNode
+import node.effect.Distortion
+import node.filter.BiquadFilter
+import node.filter.SvfFilter
 
-interface Effect {
+fun interface Effect {
     fun buildNode(): AudioNode
 }
 
@@ -32,8 +36,8 @@ class StereoMixNode(private val nodes: Pair<AudioNode, AudioNode>, val mix: Doub
         return doubleArrayOf(mixedLeft, mixedRight)
     }
 
-    override fun clone(): AudioNode {
-        return StereoMixNode(nodes.first.clone() to nodes.second.clone(), mix)
+    override fun cloneSettings(): AudioNode {
+        return StereoMixNode(nodes.first.cloneSettings() to nodes.second.cloneSettings(), mix)
     }
 
     override fun reset() {

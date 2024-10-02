@@ -25,7 +25,7 @@
     }
   },
   "params": {
-    "vibrato": 0.008,
+    "vibrato": 0.006,
     "waves": [
       {
         "type": "soft saw",
@@ -36,45 +36,18 @@
         "envelopes": [
           "adsr"
         ]
-      },
-      {
-        "type": "saw",
-        "settings": {
-          "amplitude": 0.1,
-          "phase": 0.0
-        },
-        "freqFactor": 2.0,
-        "envelopes": [
-          "adsr"
-        ]
-      },
-      {
-        "type": "soft square",
-        "settings": {
-          "amplitude": 0.3,
-          "phase": 0.75
-        },
-        "envelopes": [
-          "adsr"
-        ]
       }
     ]
   },
   "effects": [
     {
-      "type": "lowpass",
+      "type": "svf",
       "params": {
-        "cutoff": 4000.0,
+        "type": "highshelf",
+        "cutoff": 300.0,
         "mix": 1.0,
-        "q": 0.7
-      }
-    },
-    {
-      "type": "highpass",
-      "params": {
-        "cutoff": 100.0,
-        "mix": 0.4,
-        "q": 0.7
+        "q": 1.7,
+        "gain": 1.0
       }
     },
     {

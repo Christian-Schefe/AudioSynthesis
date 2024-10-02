@@ -1,4 +1,4 @@
-package nodes
+package node
 
 class ModulatedDelay(private val tapCount: Int, private val maxDelay: Double) : AudioNode(tapCount + 1, 1) {
     private var bufferSize = (44100 * maxDelay).toInt() + 3
@@ -33,7 +33,7 @@ class ModulatedDelay(private val tapCount: Int, private val maxDelay: Double) : 
         return doubleArrayOf(output)
     }
 
-    override fun clone(): AudioNode {
+    override fun cloneSettings(): AudioNode {
         val node = ModulatedDelay(tapCount, maxDelay)
         node.buffer = buffer.copyOf()
         node.pointer = pointer

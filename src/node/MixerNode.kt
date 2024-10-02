@@ -1,4 +1,4 @@
-package nodes
+package node
 
 import kotlin.math.min
 
@@ -37,10 +37,10 @@ class MixerNode : AudioNode(0, 2) {
         }
     }
 
-    override fun clone(): AudioNode {
+    override fun cloneSettings(): AudioNode {
         val node = MixerNode()
         for ((n, v, p) in nodes) {
-            node.addNode(n.clone(), v, p)
+            node.addNode(n.cloneSettings(), v, p)
         }
         return node
     }

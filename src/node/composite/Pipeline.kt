@@ -1,4 +1,7 @@
-package nodes
+package node.composite
+
+import node.AudioNode
+import node.Context
 
 class Pipeline(val nodes: List<AudioNode>) : AudioNode(nodes.first().inputCount, nodes.last().outputCount) {
     init {
@@ -16,8 +19,8 @@ class Pipeline(val nodes: List<AudioNode>) : AudioNode(nodes.first().inputCount,
         return current
     }
 
-    override fun clone(): AudioNode {
-        return Pipeline(nodes.map { it.clone() })
+    override fun cloneSettings(): AudioNode {
+        return Pipeline(nodes.map { it.cloneSettings() })
     }
 
     override fun init(ctx: Context) {
