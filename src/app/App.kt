@@ -26,18 +26,18 @@ fun app() {
     val ctxClone = ctx.clone()
     val playDuration = song.duration() + 2
 
-    val shouldRender = askShouldRender()
 
-    val handle = if (shouldRender) {
-        thread {
+    val handle = thread {
+        val shouldRender = askShouldRender()
+        if (shouldRender) {
             val wavFile = render(ctxClone, mixerClone, playDuration)
             save(wavFile, "output.wav")
         }
-    } else null
+    }
 
     val player = AudioPlayer()
     player.renderAndPlay(mixer, ctx, playDuration)
-    handle?.join()
+    handle.join()
 }
 
 fun parse(ctx: Context, json: String): Pair<Song, MixerNode> {

@@ -1,13 +1,13 @@
 {
-  "name": "violin",
+  "name": "saw1",
   "synth": "simpleSynth",
   "envelopes": {
     "adsr": {
       "attack": [
         {
-          "duration": 0.2,
+          "duration": 0.05,
           "endValue": 1.0,
-          "steepness": 0.5
+          "steepness": 1.0
         },
         {
           "duration": 1.0,
@@ -25,35 +25,35 @@
     }
   },
   "params": {
-    "vibrato": 0.005,
+    "vibrato": 0.008,
     "waves": [
       {
-        "type": "pwm",
+        "type": "soft saw",
+        "settings": {
+          "amplitude": 0.6,
+          "phase": 0.0
+        },
+        "envelopes": [
+          "adsr"
+        ]
+      },
+      {
+        "type": "saw",
         "settings": {
           "amplitude": 0.1,
-          "modulationAmount": 0.01,
-          "modulationFreq": 50,
-          "modulatorShape": "triangle"
+          "phase": 0.0
         },
+        "freqFactor": 2.0,
         "envelopes": [
           "adsr"
         ]
       },
       {
-        "type": "soft saw",
+        "type": "soft square",
         "settings": {
-          "amplitude": 0.3
+          "amplitude": 0.3,
+          "phase": 0.75
         },
-        "envelopes": [
-          "adsr"
-        ]
-      },
-      {
-        "type": "soft saw",
-        "settings": {
-          "amplitude": 0.3
-        },
-        "freqFactor": 0.995,
         "envelopes": [
           "adsr"
         ]
@@ -84,7 +84,7 @@
         "separation": 0.015,
         "variance": 0.005,
         "modulationSpeed": 0.5,
-        "mix": 0.1
+        "mix": 0.3
       }
     }
   ]

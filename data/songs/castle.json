@@ -24,7 +24,7 @@
         2
       ],
       "instrument": "violin",
-      "volume": 0.2,
+      "volume": 0.15,
       "pan": 0.0,
       "effects": []
     },
@@ -32,8 +32,8 @@
       "tracks": [
         3
       ],
-      "instrument": "flute",
-      "volume": 0.2,
+      "instrument": "violin",
+      "volume": 0.15,
       "pan": 0.1,
       "effects": []
     },
@@ -42,7 +42,7 @@
         4
       ],
       "instrument": "cello",
-      "volume": 0.3,
+      "volume": 0.25,
       "pan": -0.1,
       "effects": []
     }

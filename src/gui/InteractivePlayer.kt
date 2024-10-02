@@ -111,9 +111,9 @@ class KeyComponent(
         super.paintComponent(g)
         g?.color = java.awt.Color.BLACK
         if (isPressed) {
-            g?.fillRect(1, 1, 98, 98)
+            g?.fillRect(2, 2, 96, 96)
         } else {
-            g?.drawRect(1, 1, 98, 98)
+            g?.drawRect(2, 2, 96, 96)
         }
     }
 

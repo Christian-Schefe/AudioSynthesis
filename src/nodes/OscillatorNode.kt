@@ -4,9 +4,7 @@ import kotlin.math.*
 
 
 class OscillatorNode(
-    private val oscillator: (Double) -> Double,
-    private val amplitude: Double = 1.0,
-    private val initialPhase: Double = 0.0
+    private val oscillator: (Double) -> Double, private val amplitude: Double, private val initialPhase: Double
 ) : AudioNode(1, 1) {
     private var phase = initialPhase % 1.0
 
@@ -22,7 +20,7 @@ class OscillatorNode(
     }
 
     override fun clone(): AudioNode {
-        val cloned = OscillatorNode(oscillator, initialPhase)
+        val cloned = OscillatorNode(oscillator, amplitude, initialPhase)
         cloned.phase = phase
         return cloned
     }
@@ -34,6 +32,10 @@ class OscillatorNode(
 
         fun square(amplitude: Double = 1.0, initialPhase: Double = 0.0): AudioNode {
             return OscillatorNode({ if (it < 0.5) 1.0 else -1.0 }, amplitude, initialPhase)
+        }
+
+        fun pulse(amplitude: Double = 1.0, initialPhase: Double = 0.0, dutyCycle: Double = 0.5): AudioNode {
+            return OscillatorNode({ if (it < dutyCycle) 1.0 else -1.0 }, amplitude, initialPhase)
         }
 
         fun triangle(amplitude: Double = 1.0, initialPhase: Double = 0.0): AudioNode {

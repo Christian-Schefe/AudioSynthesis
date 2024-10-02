@@ -1,13 +1,13 @@
 {
-  "name": "violin",
+  "name": "clarinet",
   "synth": "simpleSynth",
   "envelopes": {
     "adsr": {
       "attack": [
         {
-          "duration": 0.2,
+          "duration": 0.05,
           "endValue": 1.0,
-          "steepness": 0.5
+          "steepness": 1.0
         },
         {
           "duration": 1.0,
@@ -25,35 +25,34 @@
     }
   },
   "params": {
-    "vibrato": 0.005,
+    "vibrato": 0.01,
     "waves": [
       {
-        "type": "pwm",
+        "type": "square",
         "settings": {
-          "amplitude": 0.1,
-          "modulationAmount": 0.01,
-          "modulationFreq": 50,
-          "modulatorShape": "triangle"
+          "amplitude": 0.5,
+          "phase": 0.0
         },
         "envelopes": [
           "adsr"
         ]
       },
       {
-        "type": "soft saw",
+        "type": "soft square",
         "settings": {
-          "amplitude": 0.3
+          "amplitude": 0.2,
+          "phase": 0.0
         },
         "envelopes": [
           "adsr"
         ]
       },
       {
-        "type": "soft saw",
+        "type": "sine",
         "settings": {
-          "amplitude": 0.3
+          "amplitude": 0.3,
+          "phase": 0.0
         },
-        "freqFactor": 0.995,
         "envelopes": [
           "adsr"
         ]
@@ -64,17 +63,8 @@
     {
       "type": "lowpass",
       "params": {
-        "cutoff": 4000.0,
-        "mix": 1.0,
-        "q": 0.7
-      }
-    },
-    {
-      "type": "highpass",
-      "params": {
-        "cutoff": 100.0,
-        "mix": 0.4,
-        "q": 0.7
+        "cutoff": 2000,
+        "q": 1.3
       }
     },
     {
@@ -84,7 +74,7 @@
         "separation": 0.015,
         "variance": 0.005,
         "modulationSpeed": 0.5,
-        "mix": 0.1
+        "mix": 0.2
       }
     }
   ]

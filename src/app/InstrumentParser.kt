@@ -99,6 +99,36 @@ fun buildSynth(synthName: String, params: JsonElement, envelopeMap: Map<String, 
                 WaveComponent(
                     FMWaveData(amplitude, modulationIndex, modulationFreqFactor), freqFactor, freqOffset, envelopes
                 )
+            } else if (type == "pwm") {
+                val settingsSchema = ObjectSchema(
+                    "amplitude" to NumberSchema() to false,
+                    "modulationAmount" to NumberSchema() to false,
+                    "modulationFreq" to NumberSchema() to false,
+                    "modulatorShape" to StringSchema() to true
+                )
+                val settingsParsed = settingsSchema.safeConvert(settings).throwIfErr()
+                val amplitude = settingsParsed["amplitude"]!!.num().value.toDouble()
+                val modulationAmount = settingsParsed["modulationAmount"]!!.num().value.toDouble()
+                val modulationFreq = settingsParsed["modulationFreq"]!!.num().value.toDouble()
+                val modulatorShapeStr = settingsParsed["modulatorShape"]?.str()?.value ?: "sine"
+                val modulatorShape = SimpleWaveType.entries.find { it.id == modulatorShapeStr }!!
+                WaveComponent(
+                    PWMWaveData(amplitude, modulationAmount, modulationFreq, modulatorShape),
+                    freqFactor,
+                    freqOffset,
+                    envelopes
+                )
+            } else if (type == "pulse") {
+                val settingsSchema = ObjectSchema(
+                    "amplitude" to NumberSchema() to false,
+                    "dutyCycle" to NumberSchema() to false,
+                    "phase" to NumberSchema() to true
+                )
+                val settingsParsed = settingsSchema.safeConvert(settings).throwIfErr()
+                val amplitude = settingsParsed["amplitude"]!!.num().value.toDouble()
+                val dutyCycle = settingsParsed["dutyCycle"]!!.num().value.toDouble()
+                val phase = settingsParsed["phase"]?.num()?.value?.toDouble() ?: 0.0
+                WaveComponent(PulseWaveData(amplitude, dutyCycle, phase), freqFactor, freqOffset, envelopes)
             } else {
                 throw IllegalArgumentException("Unknown wave type $type")
             }

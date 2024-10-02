@@ -4,14 +4,15 @@
     {
       "instrument": "piano",
       "tracks": [
-        6
+        6,
+        9
       ],
       "volume": 0.2,
       "pan": 0.0,
       "effects": []
     },
     {
-      "instrument": "flute",
+      "instrument": "clarinet",
       "tracks": [
         3,
         4

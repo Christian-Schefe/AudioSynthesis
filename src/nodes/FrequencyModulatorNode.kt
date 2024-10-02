@@ -3,11 +3,11 @@ package nodes
 import kotlin.math.PI
 import kotlin.math.sin
 
-class ModulatedOscillatorNode(
+class FrequencyModulatorNode(
     private val carrierOscillator: (Double) -> Double,
     private val modulatorOscillator: (Double) -> Double,
-    private val amplitude: Double = 1.0,
-    private val modulationIndex: Double = 1.0
+    private val amplitude: Double,
+    private val modulationIndex: Double
 ) : AudioNode(2, 1) {
     private var carrierPhase = 0.0
     private var modulatorPhase = 0.0
@@ -34,7 +34,7 @@ class ModulatedOscillatorNode(
     }
 
     override fun clone(): AudioNode {
-        val cloned = ModulatedOscillatorNode(
+        val cloned = FrequencyModulatorNode(
             carrierOscillator, modulatorOscillator, amplitude, modulationIndex
         )
         cloned.carrierPhase = carrierPhase
@@ -43,8 +43,8 @@ class ModulatedOscillatorNode(
     }
 
     companion object {
-        fun fm(amplitude: Double = 1.0, modulationIndex: Double = 1.0): ModulatedOscillatorNode {
-            return ModulatedOscillatorNode({ sin(2 * PI * it) }, { sin(2 * PI * it) }, amplitude, modulationIndex
+        fun fm(amplitude: Double = 1.0, modulationIndex: Double = 1.0): FrequencyModulatorNode {
+            return FrequencyModulatorNode({ sin(2 * PI * it) }, { sin(2 * PI * it) }, amplitude, modulationIndex
             )
         }
     }
