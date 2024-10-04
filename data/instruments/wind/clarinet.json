@@ -76,6 +76,12 @@
         "modulationSpeed": 0.5,
         "mix": 0.2
       }
+    },
+    {
+      "type": "gain",
+      "params": {
+        "gain": 0.5
+      }
     }
   ]
 }

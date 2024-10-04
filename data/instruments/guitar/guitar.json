@@ -12,14 +12,35 @@
         {
           "duration": 1.5,
           "endValue": 0.0,
-          "steepness": 1.0
+          "steepness": 0.4
         }
       ],
       "release": [
         {
           "duration": 0.3,
           "endValue": 0.0,
+          "steepness": 0.4
+        }
+      ]
+    },
+    "adsr2": {
+      "attack": [
+        {
+          "duration": 0.01,
+          "endValue": 1.0,
           "steepness": 1.0
+        },
+        {
+          "duration": 0.3,
+          "endValue": 0.0,
+          "steepness": 0.4
+        }
+      ],
+      "release": [
+        {
+          "duration": 0.1,
+          "endValue": 0.0,
+          "steepness": 0.4
         }
       ]
     }
@@ -30,16 +51,67 @@
       {
         "type": "fm",
         "settings": {
-          "amplitude": 1.0,
-          "modulationIndex": 1,
-          "modulationFreqFactor": 1.5
+          "amplitude": 0.5,
+          "modulationIndex": 2,
+          "modulationFreqFactor": 2
         },
         "envelopes": [
           "adsr"
+        ]
+      },
+      {
+        "type": "saw",
+        "settings": {
+          "amplitude": 0.5
+        },
+        "envelopes": [
+          "adsr"
+        ]
+      },
+      {
+        "type": "triangle",
+        "settings": {
+          "amplitude": 0.4
+        },
+        "envelopes": [
+          "adsr2"
         ]
       }
     ]
   },
   "effects": [
+    {
+      "type": "lowpass",
+      "params": {
+        "cutoff": 4000.0,
+        "mix": 0.3,
+        "q": 0.7
+      }
+    },
+    {
+      "type": "highpass",
+      "params": {
+        "cutoff": 100.0,
+        "mix": 0.3,
+        "q": 0.7
+      }
+    },
+    {
+      "type": "distortion",
+      "params": {
+        "hardness": 0.5,
+        "mix": 0.3
+      }
+    },
+    {
+      "type": "chorus",
+      "params": {
+        "voiceCount": 5,
+        "separation": 0.015,
+        "variance": 0.005,
+        "modulationSpeed": 0.5,
+        "mix": 0.1
+      }
+    }
   ]
 }

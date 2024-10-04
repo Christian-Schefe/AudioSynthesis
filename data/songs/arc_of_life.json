@@ -3,11 +3,17 @@
   "tracks": [
     {
       "tracks": [
-        0,
+        0
+      ],
+      "instrument": "flute",
+      "volume": 0.2
+    },
+    {
+      "tracks": [
         1,
         2
       ],
-      "instrument": "flute",
+      "instrument": "clarinet",
       "volume": 0.2
     },
     {

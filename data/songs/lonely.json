@@ -32,7 +32,7 @@
       "channels": [
         3
       ],
-      "instrument": "electric guitar",
+      "instrument": "guitar",
       "volume": 0.2,
       "pan": -0.5,
       "effects": []
@@ -57,7 +57,7 @@
         5,
         6
       ],
-      "instrument": "xylophone",
+      "instrument": "choir",
       "volume": 0.2,
       "pan": 0.0,
       "effects": []

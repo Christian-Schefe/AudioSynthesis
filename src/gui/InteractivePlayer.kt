@@ -69,7 +69,7 @@ class InteractivePlayer(val ctx: Context, node: AudioNode, effects: List<Effect>
 
         val fullNodes = settingsNodes.map { Pipeline(listOf(it, node.cloneSettings())) }
         val mixer = MixerNode()
-        fullNodes.forEach { mixer.addNode(it, 1.0, 0.0) }
+        fullNodes.forEach { mixer.addNode(it, 0.3, 0.0) }
         val effectAppliedNode = applyEffects(mixer, effects)
 
 
